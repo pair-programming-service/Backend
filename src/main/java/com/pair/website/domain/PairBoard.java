@@ -13,13 +13,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PairBoard extends BaseTimeEntity {
 
@@ -46,7 +47,7 @@ public class PairBoard extends BaseTimeEntity {
     private String ide;
 
     @Column
-    private LocalDateTime runningTime;
+    private String runningTime;
 
     @Column
     private String proceed;
