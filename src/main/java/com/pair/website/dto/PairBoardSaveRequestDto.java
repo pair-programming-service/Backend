@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pair.website.domain.PairBoard;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class PairBoardSaveRequestDto {
 
@@ -22,19 +26,16 @@ public class PairBoardSaveRequestDto {
     //@JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate runningDate;
 
-    // dto -> entity
-    @Builder
-    public PairBoardSaveRequestDto(String title, String content, String ide, String proceed,
-        String runningTime, String category, LocalDate runningDate) {
-        this.title = title;
-        this.content = content;
-        this.ide = ide;
-        this.proceed = proceed;
-        this.runningTime = runningTime;
-        this.category = category;
-        this.runningDate = runningDate;
-    }
+    private Boolean cLanguage;
+    private Boolean cSharp;
+    private Boolean cPlusPlus;
+    private Boolean javaScript;
+    private Boolean java;
+    private Boolean python;
+    private Boolean nodeJs;
+    private Boolean typeScript;
 
+    // dto -> entity
     public PairBoard toEntity() {
         return PairBoard.builder()
             .title(title).content(content).ide(ide).proceed(proceed).runningTime(runningTime)

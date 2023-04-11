@@ -19,12 +19,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
-// @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PairBoard extends BaseTimeEntity {
 
@@ -37,8 +37,7 @@ public class PairBoard extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "board_language_id")
+    @OneToOne(mappedBy = "pairBoard", fetch = FetchType.LAZY)
     private BoardLanguage boardLanguage;
 
     @Column(nullable = false)
@@ -71,9 +70,11 @@ public class PairBoard extends BaseTimeEntity {
     private int viewCount;
 
     @Builder
-    public PairBoard(Member member, BoardLanguage boardLanguage, String title, String content,
-        String ide, String runningTime, String category, String proceed,
-        LocalDate runningDate, Boolean status, int viewCount) {
+    public PairBoard(Long id, Member member, BoardLanguage boardLanguage, String title,
+        String content,
+        String ide, String runningTime, String category, String proceed, LocalDate runningDate,
+        Boolean status, int viewCount) {
+        this.id = id;
         this.member = member;
         this.boardLanguage = boardLanguage;
         this.title = title;
@@ -86,4 +87,5 @@ public class PairBoard extends BaseTimeEntity {
         this.status = status;
         this.viewCount = viewCount;
     }
+
 }
