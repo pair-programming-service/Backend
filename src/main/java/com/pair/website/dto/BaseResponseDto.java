@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class BaseResponseDto<T> {
+
     private boolean success;
     private T data; //제네릭의 변수 선언방법
     private Error error;
@@ -13,6 +14,7 @@ public class BaseResponseDto<T> {
     @AllArgsConstructor
     @Getter
     public static class Error {
+
         private String code;
         private String message;
     }

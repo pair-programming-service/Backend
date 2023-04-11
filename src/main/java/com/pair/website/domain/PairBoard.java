@@ -1,7 +1,9 @@
 package com.pair.website.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ser.Serializers.Base;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,9 +15,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
@@ -33,8 +40,7 @@ public class PairBoard extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "board_language_id")
+    @OneToOne(mappedBy = "pairBoard", fetch = FetchType.LAZY)
     private BoardLanguage boardLanguage;
 
     @Column(nullable = false)
@@ -50,15 +56,21 @@ public class PairBoard extends BaseTimeEntity {
     private String runningTime;
 
     @Column
+    private String category;
+
+    @Column
     private String proceed;
 
     @Column(nullable = false)
-    private LocalDateTime runningDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate runningDate;
 
-    @Column
-    // ? @ColumnDefault() // 1: 모집중, 0: 모집완료
+    @Column // default를 어떻게 true로 할까? 지금 builder에 True로 해놨음
+    // @ColumnDefault() //: 사용법 알아보기  // 1: 모집중, 0: 모집완료
     private Boolean status;
 
     @Column
     private int viewCount;
+
+
 }
