@@ -5,17 +5,25 @@ import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.BaseResponseDto;
 import com.pair.website.dto.PairBoardSaveRequestDto;
 import com.pair.website.dto.PairBoardSaveResponseDto;
+import com.pair.website.dto.response.BoardAllResponseDto;
+import com.pair.website.dto.response.BoardLanguageResponseDto;
 import com.pair.website.repository.BoardLanguageRepository;
 import com.pair.website.repository.PairBoardRepository;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@Service
-@Transactional
-@RequiredArgsConstructor
-public class PairBoardService {
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class PairBoardService {
 
     private final PairBoardRepository pairBoardRepository;
     private final BoardLanguageRepository boardLanguageRepository;
@@ -50,5 +58,23 @@ public class PairBoardService {
         return BaseResponseDto.success(responseDto);
     }
 
+    // 페어 목록 글 전체 보기
+    public BaseResponseDto<?> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size); // 페이징 처리
+
+        List<PairBoard> pairBoards = pairBoardRepository.findAllByOrderByIdDesc(
+            pageable); // id기준으로 내림차순 정렬
+
+        List<BoardAllResponseDto> boardAllResponseDtos = new ArrayList<>();
+        for (PairBoard pairBoard : pairBoards) {
+            // BoardLanguage정보를 Response에 담아주기 위한 객체 생성
+            Optional<BoardLanguage> boardLanguage = boardLanguageRepository.findById(
+                pairBoard.getBoardLanguage().getId());
+
+
+        }
+
+        return BaseResponseDto.success(boardAllResponseDtos);
+    }
 
 }

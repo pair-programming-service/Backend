@@ -16,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,8 @@ import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PairBoard extends BaseTimeEntity {
 
@@ -69,23 +72,5 @@ public class PairBoard extends BaseTimeEntity {
     @Column
     private int viewCount;
 
-    @Builder
-    public PairBoard(Long id, Member member, BoardLanguage boardLanguage, String title,
-        String content,
-        String ide, String runningTime, String category, String proceed, LocalDate runningDate,
-        Boolean status, int viewCount) {
-        this.id = id;
-        this.member = member;
-        this.boardLanguage = boardLanguage;
-        this.title = title;
-        this.content = content;
-        this.ide = ide;
-        this.runningTime = runningTime;
-        this.category = category;
-        this.proceed = proceed;
-        this.runningDate = runningDate;
-        this.status = status;
-        this.viewCount = viewCount;
-    }
 
 }
