@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardLanguageResponseDto {
-    private Boolean C;
+    private Boolean cLanguage;
     private Boolean cSharp;
     private Boolean cPlusPlus;
     private Boolean javaScript;

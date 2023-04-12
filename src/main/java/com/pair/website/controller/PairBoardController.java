@@ -8,16 +8,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.pair.website.dto.BaseResponseDto;
 import com.pair.website.service.PairBoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,12 +32,12 @@ public class PairBoardController {
     }
 
 
-    @RequestMapping(path = "/api/board/all", method = RequestMethod.GET)
+    @GetMapping("/api/board/all")
     public BaseResponseDto<?> getAll(@RequestParam("page") int page,
-        @RequestParam("size") int size) {
-
+        @RequestParam("size") int size, {
+        @RequestParam(value = "search",defaultValue = "")String keyword) {
         page = page - 1;
-        return pairBoardService.getAll(page, size);
+        return pairBoardService.getAll(page, size,keyword);
     }
 
     // 페어 게시물 수정 API
