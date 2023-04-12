@@ -35,4 +35,9 @@ public class PairBoardController {
         return pairBoardService.getAll(page, size,keyword);
     }
 
+    @GetMapping("/api/board/detail/{id}")
+    public BaseResponseDto<?> detail(@PathVariable Long id) {
+        return pairBoardService.detail(id);
+    }
+
 }

@@ -92,6 +92,34 @@ public class PairBoardService {
         return BaseResponseDto.success(boardAllResponseDtos);
     }
 
+    @Transactional(readOnly = true)
+    public BaseResponseDto<?> detail(Long id) {
+        PairBoard pairBoard = pairBoardRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("NOT_FOUND_BOARD")
+        );
+        Optional<BoardLanguage> boardLanguage = boardLanguageRepository.findById(id);
+        List<String> languageList = new ArrayList<>();
+        languageCheck(boardLanguage,languageList);
+
+        return BaseResponseDto.success(
+                BoardAllResponseDto.builder()
+                        .id(pairBoard.getId())
+                        .title(pairBoard.getTitle())
+                        .content(pairBoard.getContent())
+                        .ide(pairBoard.getIde())
+                        .runningTime(pairBoard.getRunningTime())
+                        .proceed(pairBoard.getProceed())
+                        .category(pairBoard.getCategory())
+                        .language(languageList)
+                        .runningDate(pairBoard.getRunningDate())
+                        .status(pairBoard.getStatus())
+                        .viewCount(pairBoard.getViewCount())
+                        .createdAt(pairBoard.getCreatedAt())
+                        .updatedAt(pairBoard.getUpdatedAt())
+                        .build()
+        );
+    }
+
     // 전체 보기 Response에 language를 Boolean 타입이 아닌 스트링 형태로 보내 위한 메서드
     public void languageCheck(Optional<BoardLanguage> boardLanguage,List<String> languageList) {
         if(boardLanguage.get().getCLanguage() == Boolean.TRUE) languageList.add("cLanguage");
@@ -103,4 +131,6 @@ public class PairBoardService {
         if(boardLanguage.get().getNodeJs() == Boolean.TRUE) languageList.add("nodeJs");
         if(boardLanguage.get().getTypeScript() == Boolean.TRUE) languageList.add("typeScript");
     }
+
+
 }
