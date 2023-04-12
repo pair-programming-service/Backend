@@ -4,6 +4,7 @@ import com.pair.website.domain.BoardLanguage;
 import com.pair.website.domain.PairBoard;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,14 +31,7 @@ public class PairBoardSaveResponseDto {
     private Boolean status;
     private int viewCount;
 
-    private Boolean cLanguage;
-    private Boolean cSharp;
-    private Boolean cPlusPlus;
-    private Boolean javaScript;
-    private Boolean java;
-    private Boolean python;
-    private Boolean nodeJs;
-    private Boolean typeScript;
+    private List<String> language;
 
 
 }

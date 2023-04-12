@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pair.website.domain.PairBoard;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,17 +26,10 @@ public class PairBoardSaveRequestDto {
     private String category;
     //@JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate runningDate;
-
-    private Boolean cLanguage;
-    private Boolean cSharp;
-    private Boolean cPlusPlus;
-    private Boolean javaScript;
-    private Boolean java;
-    private Boolean python;
-    private Boolean nodeJs;
-    private Boolean typeScript;
+    private List<String> language;
 
     // dto -> entity
+    // status null 값 default true 로 하기
     public PairBoard toEntity() {
         return PairBoard.builder()
             .title(title).content(content).ide(ide).proceed(proceed).runningTime(runningTime)
