@@ -19,7 +19,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(indexes = {@Index(name ="title_idx",columnList = "title"), @Index(name = "content_idx",columnList = "content")})
+@Table(indexes = {@Index(name = "title_idx", columnList = "title"),
+    @Index(name = "content_idx", columnList = "content")})
 public class PairBoard extends BaseTimeEntity {
 
     @Id
@@ -65,14 +66,14 @@ public class PairBoard extends BaseTimeEntity {
 
     public void update(BoardLanguage boardLanguage, String title,
         String content,
-        String ide, String runningTime, String category, String proceed, LocalDate runningDate,
+        String ide, String category, String runningTime, String proceed, LocalDate runningDate,
         Boolean status, int viewCount) {
         this.boardLanguage = boardLanguage;
         this.title = title;
         this.content = content;
         this.ide = ide;
-        this.runningTime = runningTime;
         this.category = category;
+        this.runningTime = runningTime;
         this.proceed = proceed;
         this.runningDate = runningDate;
         this.status = status;

@@ -34,10 +34,10 @@ public class PairBoardController {
 
     @GetMapping("/api/board/all")
     public BaseResponseDto<?> getAll(@RequestParam("page") int page,
-        @RequestParam("size") int size, {
-        @RequestParam(value = "search",defaultValue = "")String keyword) {
+        @RequestParam("size") int size,
+        @RequestParam(value = "search", defaultValue = "") String keyword) {
         page = page - 1;
-        return pairBoardService.getAll(page, size,keyword);
+        return pairBoardService.getAll(page, size, keyword);
     }
 
     // 페어 게시물 수정 API
