@@ -39,6 +39,12 @@ public class PairBoardController {
         page = page - 1;
         return pairBoardService.getAll(page, size, keyword);
     }
+    
+    // 페어 게시물 상세 보기
+    @GetMapping("/api/board/detail/{id}")
+    public BaseResponseDto<?> detail(@PathVariable Long id) {
+        return pairBoardService.detail(id);
+    }
 
     // 페어 게시물 수정 API
     @PutMapping("/api/board/{id}")

@@ -99,7 +99,34 @@ public class PairBoardService {
         return BaseResponseDto.success(boardAllResponseDtos);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
+    public BaseResponseDto<?> detail(Long id) {
+        PairBoard pairBoard = pairBoardRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("NOT_FOUND_BOARD")
+        );
+        Optional<BoardLanguage> boardLanguage = boardLanguageRepository.findById(id);
+        List<String> languageList = new ArrayList<>();
+        languageCheck(boardLanguage,languageList);
+
+        return BaseResponseDto.success(
+                BoardAllResponseDto.builder()
+                        .id(pairBoard.getId())
+                        .title(pairBoard.getTitle())
+                        .content(pairBoard.getContent())
+                        .ide(pairBoard.getIde())
+                        .runningTime(pairBoard.getRunningTime())
+                        .proceed(pairBoard.getProceed())
+                        .category(pairBoard.getCategory())
+                        .language(languageList)
+                        .runningDate(pairBoard.getRunningDate())
+                        .status(pairBoard.getStatus())
+                        .viewCount(pairBoard.getViewCount())
+                        .createdAt(pairBoard.getCreatedAt())
+                        .updatedAt(pairBoard.getUpdatedAt())
+                        .build()
+        );
+    }
+
     public BaseResponseDto<?> update(PairBoardSaveRequestDto requestDto, Long id) {
 
         PairBoard pairBoard = pairBoardRepository.findById(id)
@@ -139,6 +166,7 @@ public class PairBoardService {
         return BaseResponseDto.success(responseDto);
 
     }
+}
 
     // 전체 보기 Response에 language를 Boolean 타입이 아닌 스트링 형태로 보내 위한 메서드
     public void languageCheck(Optional<BoardLanguage> boardLanguage, List<String> languageList) {
@@ -167,8 +195,7 @@ public class PairBoardService {
             languageList.add("typeScript");
         }
     }
-
-    // 스트링 값으로 받아온 language -> Boolean 타입으로 바꿈
+    
     public BoardLanguageResponseDto getBoardLanguageResponseDto(List<String> languageList) {
         BoardLanguageResponseDto boardLanguageResponseDto = new BoardLanguageResponseDto();
         for (String language : languageList) {
