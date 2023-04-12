@@ -57,5 +57,16 @@ public class BoardLanguage {
     @Column
     private Boolean typeScript;
 
-
+    public void update(Boolean cLanguage, Boolean cSharp,
+        Boolean cPlusPlus, Boolean javaScript, Boolean java, Boolean python, Boolean nodeJs,
+        Boolean typeScript) {
+        this.cLanguage = cLanguage;
+        this.cSharp = cSharp;
+        this.cPlusPlus = cPlusPlus;
+        this.javaScript = javaScript;
+        this.java = java;
+        this.python = python;
+        this.nodeJs = nodeJs;
+        this.typeScript = typeScript;
+    }
 }

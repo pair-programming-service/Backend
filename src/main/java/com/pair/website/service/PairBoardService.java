@@ -92,6 +92,7 @@ public class PairBoardService {
         return BaseResponseDto.success(boardAllResponseDtos);
     }
 
+
     @Transactional(readOnly = true)
     public BaseResponseDto<?> detail(Long id) {
         PairBoard pairBoard = pairBoardRepository.findById(id).orElseThrow(
@@ -119,6 +120,43 @@ public class PairBoardService {
                         .build()
         );
     }
+
+
+    public BaseResponseDto<?> update(PairBoardSaveRequestDto requestDto, Long id) {
+
+        PairBoard pairBoard = pairBoardRepository.findById(id)
+            .orElseThrow(IllegalArgumentException::new);
+
+        BoardLanguage boardLanguage = boardLanguageRepository.findById(
+            pairBoard.getBoardLanguage().getId()).orElseThrow(IllegalArgumentException::new);
+        boardLanguage.update(requestDto.getCLanguage(), requestDto.getCSharp(),
+            requestDto.getCPlusPlus(), requestDto.getJavaScript(), requestDto.getJava()
+            , requestDto.getPython(), requestDto.getNodeJs(), requestDto.getTypeScript());
+
+        pairBoard.update(boardLanguage, requestDto.getTitle(), requestDto.getContent(),
+            requestDto.getIde(),
+            requestDto.getProceed(),
+            requestDto.getRunningTime(), requestDto.getCategory(),
+            requestDto.getRunningDate(), pairBoard.getStatus(),
+            pairBoard.getViewCount());
+
+        PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder().id(
+                pairBoard.getId()).boardLanguageId(boardLanguage.getId()).title(pairBoard.getTitle())
+            .content(
+                pairBoard.getContent()).ide(pairBoard.getIde()).proceed(pairBoard.getProceed())
+            .runningTime(
+                pairBoard.getRunningTime()).category(pairBoard.getCategory())
+            .runningDate(pairBoard.getRunningDate()).createdAt(pairBoard.getCreatedAt())
+            .updatedAt(pairBoard.getUpdatedAt()).status(pairBoard.getStatus()).viewCount(
+                pairBoard.getViewCount()).cLanguage(boardLanguage.getCLanguage())
+            .cSharp(boardLanguage.getCSharp())
+            .cPlusPlus(boardLanguage.getCPlusPlus()).javaScript(boardLanguage.getJavaScript())
+            .java(boardLanguage.getJava()).python(boardLanguage.getPython())
+            .nodeJs(boardLanguage.getNodeJs()).typeScript(boardLanguage.getTypeScript()).build();
+
+        return BaseResponseDto.success(responseDto);
+
+}
 
     // 전체 보기 Response에 language를 Boolean 타입이 아닌 스트링 형태로 보내 위한 메서드
     public void languageCheck(Optional<BoardLanguage> boardLanguage,List<String> languageList) {

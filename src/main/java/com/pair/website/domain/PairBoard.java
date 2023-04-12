@@ -63,5 +63,20 @@ public class PairBoard extends BaseTimeEntity {
     @Column
     private int viewCount;
 
+    public void update(BoardLanguage boardLanguage, String title,
+        String content,
+        String ide, String runningTime, String category, String proceed, LocalDate runningDate,
+        Boolean status, int viewCount) {
+        this.boardLanguage = boardLanguage;
+        this.title = title;
+        this.content = content;
+        this.ide = ide;
+        this.runningTime = runningTime;
+        this.category = category;
+        this.proceed = proceed;
+        this.runningDate = runningDate;
+        this.status = status;
+        this.viewCount = viewCount;
+    }
 
 }
