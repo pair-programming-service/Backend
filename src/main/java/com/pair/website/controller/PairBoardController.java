@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 
+import javax.persistence.EntityManager;
+
 @RestController
 @RequiredArgsConstructor
 public class PairBoardController {
@@ -31,13 +33,16 @@ public class PairBoardController {
         return pairBoardService.save(requestDto);
     }
 
-
     @GetMapping("/api/board/all")
-    public BaseResponseDto<?> getAll(@RequestParam("page") int page,
-        @RequestParam("size") int size,
-        @RequestParam(value = "search", defaultValue = "") String keyword) {
+    public BaseResponseDto<?> getAll(
+                                     @RequestParam(value = "page",defaultValue = "1") int page, @RequestParam(value = "size",defaultValue = "20") int size,
+                                     @RequestParam(value = "search", defaultValue = "") String keyword, @RequestParam(value = "cLanguage", defaultValue = "false") Boolean cLanguage,
+                                     @RequestParam(value = "cSharp", defaultValue = "false") Boolean cSharp, @RequestParam(value = "cPlusPlus", defaultValue = "false") Boolean cPlusPlus,
+                                     @RequestParam(value = "javaScript", defaultValue = "false") Boolean javaScript , @RequestParam(value = "java", defaultValue = "false") Boolean java,
+                                     @RequestParam(value = "python", defaultValue = "false") Boolean python, @RequestParam(value = "nodeJs", defaultValue = "false") Boolean nodeJs,
+                                     @RequestParam(value = "typeScript", defaultValue = "false") Boolean typeScript) {
         page = page - 1;
-        return pairBoardService.getAll(page, size, keyword);
+        return pairBoardService.getAll(page,size, keyword,cLanguage,cSharp,cPlusPlus,javaScript,java,python,nodeJs,typeScript);
     }
     
     // 페어 게시물 상세 보기
