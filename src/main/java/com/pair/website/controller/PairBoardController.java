@@ -53,4 +53,10 @@ public class PairBoardController {
 
         return pairBoardService.update(requestDto, id);
     }
+
+    // 게시물 삭제
+    @DeleteMapping("/api/board/{id}")
+    public BaseResponseDto<?> delete(@PathVariable Long id){
+        return pairBoardService.deleteBoard(id);
+    }
 }
