@@ -230,9 +230,4 @@ public class PairBoardService {
         return boardLanguageResponseDto;
     }
 
-    public Boolean filterCheck(){
-
-        return false;
-    }
-
 }
