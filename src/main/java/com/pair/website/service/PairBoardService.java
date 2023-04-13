@@ -146,6 +146,18 @@ public class PairBoardService {
     }
 
 
+    // 게시물 삭제
+    public BaseResponseDto<?> deleteBoard(Long id){
+        Optional<PairBoard> pairBoard = pairBoardRepository.findById(id);
+        if(!pairBoard.isPresent()) return BaseResponseDto.fail("NOT_FOUND_BOARD","게시물을 찾을 수 없습니다.");
+        BoardLanguage boardLanguage = boardLanguageRepository.findByPairBoardId(id);
+
+        pairBoardRepository.deleteById(id);
+        boardLanguageRepository.delete(boardLanguage);
+
+        return BaseResponseDto.success("게시물이 삭제되었습니다.");
+    }
+
     // 전체 보기 Response에 language를 Boolean 타입이 아닌 스트링 형태로 보내 위한 메서드
     public void languageCheck(Optional<BoardLanguage> boardLanguage, List<String> languageList) {
         if (boardLanguage.get().getCLanguage() == Boolean.TRUE) {
