@@ -50,15 +50,14 @@ public class PairBoardService {
         log.info("boardLanguage : {}", boardLanguage);
         boardLanguageRepository.save(boardLanguage);
 
-        PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder().id(
-                pairBoard.getId()).boardLanguageId(boardLanguage.getId()).title(pairBoard.getTitle())
-            .content(
-                pairBoard.getContent()).ide(pairBoard.getIde()).proceed(pairBoard.getProceed())
-            .runningTime(
-                pairBoard.getRunningTime()).category(pairBoard.getCategory())
-            .runningDate(pairBoard.getRunningDate()).createdAt(pairBoard.getCreatedAt())
-            .updatedAt(pairBoard.getUpdatedAt()).status(pairBoard.getStatus()).viewCount(
-                pairBoard.getViewCount()).language(languageList).build();
+        PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder()
+            .id(pairBoard.getId()).boardLanguageId(boardLanguage.getId())
+            .title(pairBoard.getTitle()).content(pairBoard.getContent()).ide(pairBoard.getIde())
+            .proceed(pairBoard.getProceed()).runningTime(pairBoard.getRunningTime())
+            .category(pairBoard.getCategory()).runningDate(pairBoard.getRunningDate())
+            .createdAt(pairBoard.getCreatedAt()).updatedAt(pairBoard.getUpdatedAt())
+            .status(pairBoard.getStatus()).viewCount(pairBoard.getViewCount())
+            .language(languageList).build();
 
         return BaseResponseDto.success(responseDto);
     }
@@ -77,22 +76,14 @@ public class PairBoardService {
                 pairBoard.getBoardLanguage().getId());
             List<String> languageList = new ArrayList<>();
             languageCheck(boardLanguage, languageList);
-            boardAllResponseDtos.add(BoardAllResponseDto.builder()
-                .id(pairBoard.getId())
-                .title(pairBoard.getTitle())
-                .content(pairBoard.getContent())
-                .ide(pairBoard.getIde())
-                .runningTime(pairBoard.getRunningTime())
-                .proceed(pairBoard.getProceed())
-                .category(pairBoard.getCategory())
-                .language(languageList)
-                .runningDate(pairBoard.getRunningDate())
-                .status(pairBoard.getStatus())
-                .viewCount(pairBoard.getViewCount())
-                .createdAt(pairBoard.getCreatedAt())
-                .updatedAt(pairBoard.getUpdatedAt())
-                .build()
-            );
+            boardAllResponseDtos.add(
+                BoardAllResponseDto.builder().id(pairBoard.getId()).title(pairBoard.getTitle())
+                    .content(pairBoard.getContent()).ide(pairBoard.getIde())
+                    .runningTime(pairBoard.getRunningTime()).proceed(pairBoard.getProceed())
+                    .category(pairBoard.getCategory()).language(languageList)
+                    .runningDate(pairBoard.getRunningDate()).status(pairBoard.getStatus())
+                    .viewCount(pairBoard.getViewCount()).createdAt(pairBoard.getCreatedAt())
+                    .updatedAt(pairBoard.getUpdatedAt()).build());
 
         }
 
@@ -101,32 +92,23 @@ public class PairBoardService {
 
     @Transactional(readOnly = true)
     public BaseResponseDto<?> detail(Long id) {
-        PairBoard pairBoard = pairBoardRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("NOT_FOUND_BOARD")
-        );
+        PairBoard pairBoard = pairBoardRepository.findById(id)
+            .orElseThrow(() -> new NullPointerException("NOT_FOUND_BOARD"));
         Optional<BoardLanguage> boardLanguage = boardLanguageRepository.findById(id);
         List<String> languageList = new ArrayList<>();
-        languageCheck(boardLanguage,languageList);
+        languageCheck(boardLanguage, languageList);
 
         return BaseResponseDto.success(
-                BoardAllResponseDto.builder()
-                        .id(pairBoard.getId())
-                        .title(pairBoard.getTitle())
-                        .content(pairBoard.getContent())
-                        .ide(pairBoard.getIde())
-                        .runningTime(pairBoard.getRunningTime())
-                        .proceed(pairBoard.getProceed())
-                        .category(pairBoard.getCategory())
-                        .language(languageList)
-                        .runningDate(pairBoard.getRunningDate())
-                        .status(pairBoard.getStatus())
-                        .viewCount(pairBoard.getViewCount())
-                        .createdAt(pairBoard.getCreatedAt())
-                        .updatedAt(pairBoard.getUpdatedAt())
-                        .build()
-        );
+            BoardAllResponseDto.builder().id(pairBoard.getId()).title(pairBoard.getTitle())
+                .content(pairBoard.getContent()).ide(pairBoard.getIde())
+                .runningTime(pairBoard.getRunningTime()).proceed(pairBoard.getProceed())
+                .category(pairBoard.getCategory()).language(languageList)
+                .runningDate(pairBoard.getRunningDate()).status(pairBoard.getStatus())
+                .viewCount(pairBoard.getViewCount()).createdAt(pairBoard.getCreatedAt())
+                .updatedAt(pairBoard.getUpdatedAt()).build());
     }
 
+    @Transactional
     public BaseResponseDto<?> update(PairBoardSaveRequestDto requestDto, Long id) {
 
         PairBoard pairBoard = pairBoardRepository.findById(id)
@@ -140,33 +122,29 @@ public class PairBoardService {
             languageList);
 
         boardLanguage.update(boardLanguageResponseDto.getCLanguage(),
-            boardLanguageResponseDto.getCSharp(),
-            boardLanguageResponseDto.getCPlusPlus(), boardLanguageResponseDto.getJavaScript(),
-            boardLanguageResponseDto.getJava()
-            , boardLanguageResponseDto.getPython(), boardLanguageResponseDto.getNodeJs(),
+            boardLanguageResponseDto.getCSharp(), boardLanguageResponseDto.getCPlusPlus(),
+            boardLanguageResponseDto.getJavaScript(), boardLanguageResponseDto.getJava(),
+            boardLanguageResponseDto.getPython(), boardLanguageResponseDto.getNodeJs(),
             boardLanguageResponseDto.getTypeScript());
 
         pairBoard.update(boardLanguage, requestDto.getTitle(), requestDto.getContent(),
-            requestDto.getIde(),
-            requestDto.getCategory(),
-            requestDto.getRunningTime(), requestDto.getProceed(),
-            requestDto.getRunningDate(), pairBoard.getStatus(),
+            requestDto.getIde(), requestDto.getCategory(), requestDto.getRunningTime(),
+            requestDto.getProceed(), requestDto.getRunningDate(), pairBoard.getStatus(),
             pairBoard.getViewCount());
 
-        PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder().id(
-                pairBoard.getId()).boardLanguageId(boardLanguage.getId()).title(pairBoard.getTitle())
-            .content(
-                pairBoard.getContent()).ide(pairBoard.getIde()).proceed(pairBoard.getProceed())
-            .runningTime(
-                pairBoard.getRunningTime()).category(pairBoard.getCategory())
-            .runningDate(pairBoard.getRunningDate()).createdAt(pairBoard.getCreatedAt())
-            .updatedAt(pairBoard.getUpdatedAt()).status(pairBoard.getStatus()).viewCount(
-                pairBoard.getViewCount()).language(languageList).build();
+        PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder()
+            .id(pairBoard.getId()).boardLanguageId(boardLanguage.getId())
+            .title(pairBoard.getTitle()).content(pairBoard.getContent()).ide(pairBoard.getIde())
+            .proceed(pairBoard.getProceed()).runningTime(pairBoard.getRunningTime())
+            .category(pairBoard.getCategory()).runningDate(pairBoard.getRunningDate())
+            .createdAt(pairBoard.getCreatedAt()).updatedAt(pairBoard.getUpdatedAt())
+            .status(pairBoard.getStatus()).viewCount(pairBoard.getViewCount())
+            .language(languageList).build();
 
         return BaseResponseDto.success(responseDto);
 
     }
-}
+
 
     // 전체 보기 Response에 language를 Boolean 타입이 아닌 스트링 형태로 보내 위한 메서드
     public void languageCheck(Optional<BoardLanguage> boardLanguage, List<String> languageList) {
@@ -195,9 +173,11 @@ public class PairBoardService {
             languageList.add("typeScript");
         }
     }
-    
+
     public BoardLanguageResponseDto getBoardLanguageResponseDto(List<String> languageList) {
-        BoardLanguageResponseDto boardLanguageResponseDto = new BoardLanguageResponseDto();
+        BoardLanguageResponseDto boardLanguageResponseDto = BoardLanguageResponseDto.builder()
+            .cLanguage(false).cSharp(false).cPlusPlus(false).javaScript(false).java(false)
+            .nodeJs(false).python(false).typeScript(false).build();
         for (String language : languageList) {
             if (language.equals("cLanguage")) {
                 boardLanguageResponseDto.setCLanguage(true);
@@ -205,10 +185,10 @@ public class PairBoardService {
             if (language.equals("cSharp")) {
                 boardLanguageResponseDto.setCSharp(true);
             }
-            if (language.equals("CPlusPlus")) {
+            if (language.equals("cPlusPlus")) {
                 boardLanguageResponseDto.setCPlusPlus(true);
             }
-            if (language.equals("javascript")) {
+            if (language.equals("javaScript")) {
                 boardLanguageResponseDto.setJavaScript(true);
             }
             if (language.equals("java")) {
