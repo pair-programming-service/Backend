@@ -3,9 +3,11 @@ package com.pair.website.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pair.website.domain.PairBoard;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,7 +34,7 @@ public class PairBoardSaveRequestDto {
     // status null 값 default true 로 하기
     public PairBoard toEntity() {
         return PairBoard.builder()
-            .title(title).content(content).ide(ide).proceed(proceed).runningTime(runningTime)
-            .category(category).runningDate(runningDate).status(true).build();
+                .title(title).content(content).ide(ide).proceed(proceed).runningTime(runningTime)
+                .category(category).runningDate(runningDate).status(true).build();
     }
 }
