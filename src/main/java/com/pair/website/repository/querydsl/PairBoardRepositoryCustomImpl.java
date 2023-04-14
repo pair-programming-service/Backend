@@ -31,8 +31,7 @@ public class PairBoardRepositoryCustomImpl extends QuerydslRepositorySupport imp
         QueryResults<PairBoard> query =  jpaQueryFactory.select(pairBoard)
                 .from(pairBoard)
                 .leftJoin(boardLanguage).on(pairBoard.id.eq(boardLanguage.pairBoard.id))
-                .where(titleContains(keyword),
-                        contentContains(keyword),
+                .where(titleContains(keyword).or(contentContains(keyword)),
                         cLanguageEqual(cLanguage),
                         cSharpEqual(cSharp),
                         cPlusPlusEqual(cPlusPlus),
