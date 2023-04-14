@@ -9,13 +9,20 @@ import com.pair.website.dto.response.BoardAllResponseDto;
 import com.pair.website.dto.response.BoardLanguageResponseDto;
 import com.pair.website.repository.BoardLanguageRepository;
 import com.pair.website.repository.PairBoardRepository;
+import com.pair.website.repository.querydsl.PairBoardRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,9 +31,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class PairBoardService {
-
     private final PairBoardRepository pairBoardRepository;
     private final BoardLanguageRepository boardLanguageRepository;
+
 
     @Transactional
     public BaseResponseDto<?> save(PairBoardSaveRequestDto requestDto) {
@@ -65,10 +72,14 @@ public class PairBoardService {
 
     // 페어 목록 글 전체 보기
     @Transactional(readOnly = true)
-    public BaseResponseDto<?> getAll(int page, int size, String keyword) {
+    public BaseResponseDto<?> getAll(int page, int size, String keyword, Boolean cLanguage,
+                                     Boolean cSharp , Boolean cPlusPlus, Boolean javaScript,
+                                     Boolean java, Boolean python, Boolean nodeJs, Boolean typeScript) {
         Pageable pageable = PageRequest.of(page, size); // 페이징 처리
+        Page<PairBoard> pairBoards = pairBoardRepository.findDynamicQuery(pageable, keyword, cLanguage, cSharp, cPlusPlus,
+                    javaScript, java, python, nodeJs, typeScript);
 
-        List<PairBoard> pairBoards = pairBoardRepository.findAllBySearch(pageable, keyword);
+
         List<BoardAllResponseDto> boardAllResponseDtos = new ArrayList<>();
         for (PairBoard pairBoard : pairBoards) {
             // BoardLanguage정보를 Response에 담아주기 위한 객체 생성
