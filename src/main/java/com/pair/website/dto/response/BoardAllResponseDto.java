@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import lombok.Setter;
 
 @Builder
@@ -20,13 +21,13 @@ public class BoardAllResponseDto {
     private String proceed;
     private String category;
     private List<String> language;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YY-MM-dd", timezone = "Asia/Seoul", locale = "en")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-dd", timezone = "Asia/Seoul", locale = "en")
     // 시간정보 형식 변경
     private LocalDate runningDate;
     private Boolean status;
     private int viewCount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YY-MM-dd HH:MM", timezone = "Asia/Seoul", locale = "en")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-dd HH:MM", timezone = "Asia/Seoul", locale = "en")
     private LocalDateTime createdAt;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YY-MM-dd HH:MM", timezone = "Asia/Seoul", locale = "en")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-dd HH:MM", timezone = "Asia/Seoul", locale = "en")
     private LocalDateTime updatedAt;
 }
