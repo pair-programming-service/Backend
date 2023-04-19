@@ -1,6 +1,7 @@
 package com.pair.website.repository.querydsl;
 
 import com.pair.website.domain.PairBoard;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -31,8 +32,7 @@ public class PairBoardRepositoryCustomImpl extends QuerydslRepositorySupport imp
         QueryResults<PairBoard> query =  jpaQueryFactory.select(pairBoard)
                 .from(pairBoard)
                 .leftJoin(boardLanguage).on(pairBoard.id.eq(boardLanguage.pairBoard.id))
-                .where(titleContains(keyword),
-                        contentContains(keyword),
+                .where(searchCondition(keyword),
                         cLanguageEqual(cLanguage),
                         cSharpEqual(cSharp),
                         cPlusPlusEqual(cPlusPlus),
@@ -49,11 +49,14 @@ public class PairBoardRepositoryCustomImpl extends QuerydslRepositorySupport imp
 
     }
 
-    private BooleanExpression titleContains(String keyword){
-        return hasText(keyword)? pairBoard.title.contains(keyword) : null;
-    }
-    private BooleanExpression contentContains(String keyword){
-        return hasText(keyword)? pairBoard.content.contains(keyword) : null;
+    private BooleanBuilder searchCondition(String keyword){
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        if(hasText(keyword)) {
+            booleanBuilder.or(pairBoard.title.contains(keyword));
+            booleanBuilder.or(pairBoard.content.contains(keyword));
+        }
+        return booleanBuilder;
     }
 
     private BooleanExpression cLanguageEqual(Boolean cLanguage){

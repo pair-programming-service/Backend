@@ -7,6 +7,7 @@ import com.pair.website.dto.PairBoardSaveRequestDto;
 import com.pair.website.dto.PairBoardSaveResponseDto;
 import com.pair.website.dto.response.BoardAllResponseDto;
 import com.pair.website.dto.response.BoardLanguageResponseDto;
+import com.pair.website.dto.response.PageResponseDto;
 import com.pair.website.repository.BoardLanguageRepository;
 import com.pair.website.repository.PairBoardRepository;
 import com.pair.website.repository.querydsl.PairBoardRepositoryCustom;
@@ -72,8 +73,8 @@ public class PairBoardService {
 
     // 페어 목록 글 전체 보기
     @Transactional(readOnly = true)
-    public BaseResponseDto<?> getAll(int page, int size, String keyword, Boolean cLanguage,
-                                     Boolean cSharp, Boolean cPlusPlus, Boolean javaScript,
+    public PageResponseDto<?> getAll(int page, int size, String keyword, Boolean cLanguage,
+                                     Boolean cSharp , Boolean cPlusPlus, Boolean javaScript,
                                      Boolean java, Boolean python, Boolean nodeJs, Boolean typeScript) {
         Pageable pageable = PageRequest.of(page, size); // 페이징 처리
         Page<PairBoard> pairBoards = pairBoardRepository.findDynamicQuery(pageable, keyword, cLanguage, cSharp, cPlusPlus,
@@ -95,10 +96,8 @@ public class PairBoardService {
                             .runningDate(pairBoard.getRunningDate()).status(pairBoard.getStatus())
                             .viewCount(pairBoard.getViewCount()).createdAt(pairBoard.getCreatedAt())
                             .updatedAt(pairBoard.getUpdatedAt()).build());
-
         }
-
-        return BaseResponseDto.success(boardAllResponseDtos);
+        return PageResponseDto.success(boardAllResponseDtos,pairBoards.getTotalPages());
     }
 
     @Transactional(readOnly = true)
