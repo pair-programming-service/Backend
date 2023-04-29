@@ -1,10 +1,13 @@
 package com.pair.website.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pair.website.domain.BoardLanguage;
 import com.pair.website.domain.PairBoard;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,7 +29,9 @@ public class PairBoardSaveResponseDto {
     private String runningTime;
     private String category;
     private LocalDate runningDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-dd HH:MM", timezone = "Asia/Seoul", locale = "en")
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-dd HH:MM", timezone = "Asia/Seoul", locale = "en")
     private LocalDateTime updatedAt;
     private Boolean status;
     private int viewCount;
