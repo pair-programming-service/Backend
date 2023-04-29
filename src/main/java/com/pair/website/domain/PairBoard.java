@@ -20,7 +20,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {@Index(name = "title_idx", columnList = "title"),
-    @Index(name = "content_idx", columnList = "content")})
+                  @Index(name = "content_idx", columnList = "content"),
+                  @Index(name = "category_idx", columnList = "category")})
 public class PairBoard extends BaseTimeEntity {
 
     @Id
