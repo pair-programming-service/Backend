@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,9 +30,9 @@ public class PairBoardController {
     // 페어 게시물 작성 API
     @PostMapping("/api/board")
     public BaseResponseDto<?> save(
-        @RequestBody PairBoardSaveRequestDto requestDto) {
+            @RequestBody PairBoardSaveRequestDto requestDto, HttpServletRequest request) {
 
-        return pairBoardService.save(requestDto);
+        return pairBoardService.save(requestDto,request);
     }
 
     @GetMapping("/api/board/all")
