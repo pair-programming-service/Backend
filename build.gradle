@@ -35,6 +35,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 //    implementation 'mysql:mysql-connector-java' // MySql
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // 소셜 로그인을 위한 의존성
 
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
