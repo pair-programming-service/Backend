@@ -26,6 +26,7 @@ public class PairBoardSaveRequestDto {
     private String proceed;
     private String runningTime;
     private String category;
+    private Boolean status;
     //@JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate runningDate;
     private List<String> language;

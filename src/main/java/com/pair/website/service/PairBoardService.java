@@ -139,7 +139,7 @@ public class PairBoardService {
 
         pairBoard.update(boardLanguage, requestDto.getTitle(), requestDto.getContent(),
                 requestDto.getIde(), requestDto.getCategory(), requestDto.getRunningTime(),
-                requestDto.getProceed(), requestDto.getRunningDate(), pairBoard.getStatus(),
+                requestDto.getProceed(), requestDto.getRunningDate(), requestDto.getStatus(),
                 pairBoard.getViewCount());
 
         PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder()
