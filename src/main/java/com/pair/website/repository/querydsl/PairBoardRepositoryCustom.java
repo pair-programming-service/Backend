@@ -12,6 +12,7 @@ import java.util.List;
 public interface PairBoardRepositoryCustom {
     // title 및 content 키워드 검색 , 유효 필터 검색
     Page<PairBoard> findDynamicQuery(Pageable pageable, @Param("search") String keyword,
+                                             @Param("category") String category,
                                              @Param("cLanguage") Boolean cLanguage, @Param("cSharp") Boolean cSharp,
                                              @Param("cPlusPlus") Boolean cPlusPlus, @Param("javaScript") Boolean javaScript,
                                              @Param("java") Boolean java, @Param("python") Boolean python,
