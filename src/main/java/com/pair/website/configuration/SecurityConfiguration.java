@@ -4,6 +4,8 @@ import com.pair.website.jwt.AccessDeniedHandlerException;
 import com.pair.website.jwt.AuthenticationEntryPointException;
 import com.pair.website.jwt.TokenProvider;
 import com.pair.website.service.UserDetailsServiceImpl;
+import com.pair.website.jwt.CustomAuthenticationEntryPoint;
+import com.pair.website.jwt.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -19,9 +21,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +40,7 @@ public class SecurityConfiguration {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationEntryPointException authenticationEntryPointException;
     private final AccessDeniedHandlerException accessDeniedHandlerException;
+    private final CorsFilter corsFilter;
 
 
     @Bean
@@ -49,29 +54,40 @@ public class SecurityConfiguration {
                 .antMatchers("/h2-console/**");
     }
 
+
+
     @Bean
     @Order(SecurityProperties.BASIC_AUTH_ORDER)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().configurationSource(corsConfigurationSource());
 
         http.csrf().disable()
-
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPointException)
-                .accessDeniedHandler(accessDeniedHandlerException)
-
-                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
                 .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(accessDeniedHandlerException)
+                .and()
+                // 인증
                 .authorizeRequests()
+                // antMathcers.permitAll 인증없이 허가
                 .antMatchers("/api/member/**").permitAll()
                 .antMatchers("/api/board/all").permitAll()
                 .antMatchers("/api/board/detail/**").permitAll()
+                // 그 이외의 모든 요청 인증 후 인가
                 .anyRequest().authenticated()
                 .and()
-                .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService));
+                .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService))
+                .and()
+                .httpBasic().disable()
+                .formLogin().disable()
+                .addFilter(corsFilter);
+
+
+        http.addFilterBefore(new JwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
+
+
         return http.build();
     }
 
@@ -81,6 +97,7 @@ public class SecurityConfiguration {
 
         //허용할 url 설정
         configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("https://codingmate-callmejeje.vercel.app");
 
         //허용할 헤더 설정
         configuration.addAllowedHeader("*");

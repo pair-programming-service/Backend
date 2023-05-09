@@ -8,11 +8,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
@@ -45,7 +45,7 @@ public class Member extends BaseTimeEntity {
 
     @Builder
     public Member(Long id, String email, String nickname, String password, String profileImage,
-        String githubLink, List<PairBoard> pairBoards) {
+                  String githubLink, List<PairBoard> pairBoards) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
@@ -57,5 +57,12 @@ public class Member extends BaseTimeEntity {
 
     public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
         return passwordEncoder.matches(password, this.password);
+    }
+    public Member update(String nickname, String profileImage, String githubLink) {
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.githubLink = githubLink;
+
+        return this;
     }
 }
