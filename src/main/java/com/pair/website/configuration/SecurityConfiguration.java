@@ -1,5 +1,7 @@
 package com.pair.website.configuration;
 
+import com.pair.website.configuration.jwt.CustomAuthenticationEntryPoint;
+import com.pair.website.configuration.jwt.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
@@ -12,9 +14,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +27,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SecurityConfiguration {
 
+    private final CorsFilter corsFilter;
+
     @Bean
     @Order(SecurityProperties.BASIC_AUTH_ORDER)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -30,6 +36,25 @@ public class SecurityConfiguration {
 
         http.csrf().ignoringAntMatchers("/h2-console/**")
                 .disable();
+
+        http.csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                .and()
+                .httpBasic().disable()
+                .formLogin().disable()
+                .addFilter(corsFilter);
+
+        http.authorizeRequests()
+                .anyRequest()    // 모든 요청에 대해서 허용하라.
+                .permitAll()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+
+        http.addFilterBefore(new JwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }

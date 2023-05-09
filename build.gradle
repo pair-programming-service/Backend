@@ -35,18 +35,23 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 //    implementation 'mysql:mysql-connector-java' // MySql
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // 소셜 로그인을 위한 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-mustache'
 
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // 소셜 로그인을 위한 의존성
 
     // json
     implementation group: 'org.json', name: 'json', version: '20160810'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-hibernate5' // Jackson Serialize
 
     // querydsl
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+    // jwt
+    implementation 'com.auth0:java-jwt:3.18.2'
 }
 
 // querydsl 사용할 경로 지정합니다.
