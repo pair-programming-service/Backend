@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,7 +45,7 @@ public class Member extends BaseTimeEntity {
 
     @Builder
     public Member(Long id, String email, String nickname, String password, String profileImage,
-        String githubLink, List<PairBoard> pairBoards) {
+                  String githubLink, List<PairBoard> pairBoards) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
@@ -53,4 +54,12 @@ public class Member extends BaseTimeEntity {
         this.githubLink = githubLink;
         this.pairBoards = pairBoards;
     }
+
+    public Member update(String nickname, String profileImage) {
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+
+        return this;
+    }
+
 }
