@@ -40,6 +40,7 @@ public class SecurityConfiguration {
 
         //허용할 url 설정
         configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("https://codingmate-callmejeje.vercel.app");
 
         //허용할 헤더 설정
         configuration.addAllowedHeader("*");
