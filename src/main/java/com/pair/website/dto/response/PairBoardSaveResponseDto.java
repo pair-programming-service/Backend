@@ -1,7 +1,8 @@
-package com.pair.website.dto;
+package com.pair.website.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pair.website.domain.BoardLanguage;
+import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import lombok.Setter;
 public class PairBoardSaveResponseDto {
 
     private Long id;
+    private Long member;
     private Long boardLanguageId;
     private String title;
     private String content;

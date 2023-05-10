@@ -1,4 +1,4 @@
-package com.pair.website.configuration.jwt;
+package com.pair.website.jwt;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

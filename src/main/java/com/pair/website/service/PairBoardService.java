@@ -1,29 +1,26 @@
 package com.pair.website.service;
 
 import com.pair.website.domain.BoardLanguage;
+import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.BaseResponseDto;
 import com.pair.website.dto.PairBoardSaveRequestDto;
-import com.pair.website.dto.PairBoardSaveResponseDto;
+import com.pair.website.dto.response.PairBoardSaveResponseDto;
 import com.pair.website.dto.response.BoardAllResponseDto;
 import com.pair.website.dto.response.BoardLanguageResponseDto;
 import com.pair.website.dto.response.PageResponseDto;
+import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.BoardLanguageRepository;
 import com.pair.website.repository.PairBoardRepository;
-import com.pair.website.repository.querydsl.PairBoardRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,12 +31,16 @@ import java.util.Optional;
 public class PairBoardService {
     private final PairBoardRepository pairBoardRepository;
     private final BoardLanguageRepository boardLanguageRepository;
-
+    private final TokenProvider tokenProvider;
 
     @Transactional
-    public BaseResponseDto<?> save(PairBoardSaveRequestDto requestDto) {
-
-        PairBoard pairBoard = requestDto.toEntity();
+    public BaseResponseDto<?> save(PairBoardSaveRequestDto requestDto, HttpServletRequest request) {
+        Member member = validateMember(request);
+        if(member == null) return BaseResponseDto.fail("INVALID_TOKEN","토큰이 유효하지 않습니다.");
+        if(request.getHeader("Authorization") == null)
+            return BaseResponseDto.fail("MEMBER_NOT_FOUND","로그인이 필요합니다.");
+        log.info("member: {}", member);
+        PairBoard pairBoard = requestDto.toEntity(member);
         pairBoardRepository.save(pairBoard);
 
         List<String> languageList = requestDto.getLanguage();
@@ -59,13 +60,14 @@ public class PairBoardService {
         boardLanguageRepository.save(boardLanguage);
 
         PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder()
-                .id(pairBoard.getId()).boardLanguageId(boardLanguage.getId())
-                .title(pairBoard.getTitle()).content(pairBoard.getContent()).ide(pairBoard.getIde())
-                .proceed(pairBoard.getProceed()).runningTime(pairBoard.getRunningTime())
-                .category(pairBoard.getCategory()).runningDate(pairBoard.getRunningDate())
-                .createdAt(pairBoard.getCreatedAt()).updatedAt(pairBoard.getUpdatedAt())
-                .status(pairBoard.getStatus()).viewCount(pairBoard.getViewCount())
-                .language(languageList).build();
+
+            .id(pairBoard.getId()).boardLanguageId(boardLanguage.getId()).member(member.getId())
+            .title(pairBoard.getTitle()).content(pairBoard.getContent()).ide(pairBoard.getIde())
+            .proceed(pairBoard.getProceed()).runningTime(pairBoard.getRunningTime())
+            .category(pairBoard.getCategory()).runningDate(pairBoard.getRunningDate())
+            .createdAt(pairBoard.getCreatedAt()).updatedAt(pairBoard.getUpdatedAt())
+            .status(pairBoard.getStatus()).viewCount(pairBoard.getViewCount())
+            .language(languageList).build();
 
         return BaseResponseDto.success(responseDto);
     }
@@ -228,6 +230,14 @@ public class PairBoardService {
             }
         }
         return boardLanguageResponseDto;
+    }
+
+    @Transactional
+    public Member validateMember(HttpServletRequest request) {
+        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+            return null;
+        }
+        return tokenProvider.getMemberFromAuthentication();
     }
 
 }

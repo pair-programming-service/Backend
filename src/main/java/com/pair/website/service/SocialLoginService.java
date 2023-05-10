@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pair.website.configuration.jwt.JwtProperties;
+import com.pair.website.jwt.JwtProperties;
 import com.pair.website.domain.Member;
 import com.pair.website.dto.BaseResponseDto;
 import com.pair.website.dto.LoginResponseDto;
@@ -23,9 +23,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

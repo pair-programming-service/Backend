@@ -13,7 +13,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -55,11 +55,14 @@ public class Member extends BaseTimeEntity {
         this.pairBoards = pairBoards;
     }
 
-    public Member update(String nickname, String profileImage) {
+    public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
+        return passwordEncoder.matches(password, this.password);
+    }
+    public Member update(String nickname, String profileImage, String githubLink) {
         this.nickname = nickname;
         this.profileImage = profileImage;
+        this.githubLink = githubLink;
 
         return this;
     }
-
 }

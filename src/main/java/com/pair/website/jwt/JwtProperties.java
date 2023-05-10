@@ -1,4 +1,4 @@
-package com.pair.website.configuration.jwt;
+package com.pair.website.jwt;
 
 public interface JwtProperties {
     String SECRET = "Codingmate"; // .gitIgnore로 수정하기

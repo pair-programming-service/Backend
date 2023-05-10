@@ -2,6 +2,7 @@ package com.pair.website.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
 
 import java.time.LocalDate;
@@ -33,9 +34,10 @@ public class PairBoardSaveRequestDto {
 
     // dto -> entity
     // status null 값 default true 로 하기
-    public PairBoard toEntity() {
+    public PairBoard toEntity(Member member) {
         return PairBoard.builder()
-                .title(title).content(content).ide(ide).proceed(proceed).runningTime(runningTime)
-                .category(category).runningDate(runningDate).status(true).build();
+            .member(member).title(title).content(content).ide(ide).proceed(proceed).runningTime(runningTime)
+            .category(category).runningDate(runningDate).status(true).build();
+
     }
 }
