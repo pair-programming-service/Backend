@@ -17,7 +17,6 @@ public class LoginResponseDto {
     private String nickname;
     private String profileImage;
     private String githubLink;
-    private String token;
     private LocalDateTime createdAt;
 
 }

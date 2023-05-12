@@ -26,7 +26,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public BaseResponseDto<?> signup(@Valid MemberRequestDto requestDto){
+    public BaseResponseDto<?> signup(@Valid MemberRequestDto requestDto) {
         if (isPresentMember(requestDto.getEmail()) != null) {
             return BaseResponseDto.fail("DUPLICATED_NICKNAME",
                     "중복된 아이디입니다.");
