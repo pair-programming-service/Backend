@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.pair.website.dto.ProfileRequestDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,10 +59,11 @@ public class Member extends BaseTimeEntity {
     public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
         return passwordEncoder.matches(password, this.password);
     }
-    public Member update(String nickname, String profileImage, String githubLink) {
-        this.nickname = nickname;
-        this.profileImage = profileImage;
-        this.githubLink = githubLink;
+
+    public Member update(ProfileRequestDto requestDto) {
+        this.nickname = requestDto.getNickname();
+        this.profileImage = requestDto.getProfileImage();
+        this.githubLink = requestDto.getGithubLink();
 
         return this;
     }

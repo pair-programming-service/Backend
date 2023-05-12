@@ -39,7 +39,7 @@ public class PairBoardService {
         if(member == null) return BaseResponseDto.fail("INVALID_TOKEN","토큰이 유효하지 않습니다.");
         if(request.getHeader("Authorization") == null)
             return BaseResponseDto.fail("MEMBER_NOT_FOUND","로그인이 필요합니다.");
-        log.info("member: {}", member);
+
         PairBoard pairBoard = requestDto.toEntity(member);
         pairBoardRepository.save(pairBoard);
 

@@ -20,6 +20,4 @@ public class MemberRequestDto {
     private String nickname;
     @NotBlank
     private String password;
-    private String profileImage;
-    private String githubLink;
 }
