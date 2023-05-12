@@ -44,6 +44,9 @@ public class SocialLoginService {
     @Value("${kakao.redirectUrl}")
     String KAKAO_REDIRECT_URI;
 
+    // 닉네임 중복처리를 위해 int max부터 내림차순으로 #id추가 ex)제리 #9999999
+    int maxID = 10000000;
+
     public BaseResponseDto<?> kakaoLogin(String code, HttpServletResponse response) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getAccessToken(code).getAccess_token();
@@ -140,11 +143,13 @@ public class SocialLoginService {
         Member member = memberRepository.findByEmail(kakaoEmail)
                 .orElse(null);
 
+        maxID = maxID - 1;
+
         if (member == null) {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
-            member = Member.builder().email(kakaoEmail).nickname(kakaoName).profileImage(kakaoImage).password("password").build();
+            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #maxID").profileImage(kakaoImage).password("password").build();
             //비밀번호 암호화 로직 추가하기
 
             memberRepository.save(member);
