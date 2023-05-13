@@ -149,7 +149,7 @@ public class SocialLoginService {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
-            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #maxID").profileImage(kakaoImage).password("password").build();
+            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #" + maxID).profileImage(kakaoImage).password("password").build();
             //비밀번호 암호화 로직 추가하기
 
             memberRepository.save(member);
@@ -172,7 +172,7 @@ public class SocialLoginService {
 
     public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
-        response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
+        response.addHeader("refreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
     }
 }
