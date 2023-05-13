@@ -26,13 +26,8 @@ public class MemberController {
     }
 
     @PostMapping("/api/member/login")
-    public BaseResponseDto<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
-        return memberService.login(loginRequestDto,response);
-    }
-
-    @PostMapping("/api/member/check")
-    public BaseResponseDto<?> nicknameCheck(@RequestBody String nickname){
-        return memberService.nicknameCheck(nickname);
+    public BaseResponseDto<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
+        return memberService.login(loginRequestDto, response);
     }
     @PutMapping("/api/member/update")
     public BaseResponseDto<?> profileUpdate(@RequestBody ProfileRequestDto requestDto, HttpServletRequest request){
@@ -41,6 +36,5 @@ public class MemberController {
         Member member = (Member)result.getData();
 
         return memberService.profileUpdate(requestDto,member.getId());
-
     }
 }
