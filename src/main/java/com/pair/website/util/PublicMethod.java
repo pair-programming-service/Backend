@@ -19,7 +19,7 @@ public class PublicMethod {
 
     @Transactional
     public BaseResponseDto<?> checkLogin(HttpServletRequest request){
-        if (null == request.getHeader("Refresh-Token")) {
+        if (null == request.getHeader("refreshToken")) {
             return BaseResponseDto.fail("MEMBER_NOT_FOUND","로그인이 필요합니다.");
         }
 
@@ -37,7 +37,7 @@ public class PublicMethod {
 
     @Transactional
     public Member validateMember(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+        if (!tokenProvider.validateToken(request.getHeader("refreshToken"))) {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();

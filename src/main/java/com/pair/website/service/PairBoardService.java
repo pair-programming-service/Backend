@@ -234,7 +234,7 @@ public class PairBoardService {
 
     @Transactional
     public Member validateMember(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+        if (!tokenProvider.validateToken(request.getHeader("refreshToken"))) {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();
