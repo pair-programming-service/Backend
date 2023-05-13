@@ -28,12 +28,13 @@ public class PairBoardRepositoryCustomImpl extends QuerydslRepositorySupport imp
 
 
     @Override
-    public Page<PairBoard> findDynamicQuery(Pageable pageable, String keyword,String category, Boolean cLanguage, Boolean cSharp, Boolean cPlusPlus, Boolean javaScript, Boolean java, Boolean python, Boolean nodeJs, Boolean typeScript) {
+    public Page<PairBoard> findDynamicQuery(Pageable pageable, String keyword,String category, Boolean status,Boolean cLanguage, Boolean cSharp, Boolean cPlusPlus, Boolean javaScript, Boolean java, Boolean python, Boolean nodeJs, Boolean typeScript) {
         QueryResults<PairBoard> query =  jpaQueryFactory.select(pairBoard)
                 .from(pairBoard)
                 .leftJoin(boardLanguage).on(pairBoard.id.eq(boardLanguage.pairBoard.id))
                 .where(searchCondition(keyword),
                         categoryEqual(category),
+                        statusEqual(status),
                         cLanguageEqual(cLanguage),
                         cSharpEqual(cSharp),
                         cPlusPlusEqual(cPlusPlus),
@@ -64,6 +65,10 @@ public class PairBoardRepositoryCustomImpl extends QuerydslRepositorySupport imp
     private BooleanExpression categoryEqual(String category){
         if(category.equals("")) return null;
         return pairBoard.category.eq(category);
+    }
+    private BooleanExpression statusEqual(Boolean status){
+        if(status == Boolean.FALSE) return null;
+        return pairBoard.status.eq(true);
     }
     private BooleanExpression cLanguageEqual(Boolean cLanguage){
         if(cLanguage == Boolean.FALSE) return null;
