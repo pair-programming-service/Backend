@@ -47,13 +47,13 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         // h2-console 사용에 대한 허용 (CSRF, FrameOptions 무시)
         return (web) -> web.ignoring()
                 .antMatchers("/h2-console/**");
     }
-
 
 
     @Bean
@@ -75,8 +75,9 @@ public class SecurityConfiguration {
                 .antMatchers("/api/member/**").permitAll()
                 .antMatchers("/api/board/all").permitAll()
                 .antMatchers("/api/board/detail/**").permitAll()
+                .antMatchers("/api/oauth/token/**").permitAll()
                 // 그 이외의 모든 요청 인증 후 인가
-                .anyRequest().authenticated()
+                //.anyRequest().authenticated()
                 .and()
                 .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService))
                 .and()

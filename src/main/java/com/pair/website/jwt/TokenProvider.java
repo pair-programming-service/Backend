@@ -50,7 +50,7 @@ public class TokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(member.getEmail())
                 .setExpiration(accessTokenExpiresIn)
-                .claim(AUTHORITIES_KEY,Authority.ROLE_MEMBER.toString())
+                .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -89,7 +89,7 @@ public class TokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(claims.getSubject())
                 .setExpiration(accessTokenExpiresIn)
-                .claim(AUTHORITIES_KEY,Authority.ROLE_MEMBER.toString())
+                .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -100,7 +100,6 @@ public class TokenProvider {
                 .refreshToken(token)
                 .build();
     }
-
 
 
     public Member getMemberFromAuthentication() {

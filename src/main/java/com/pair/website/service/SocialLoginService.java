@@ -4,16 +4,19 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pair.website.dto.TokenDto;
 import com.pair.website.jwt.JwtProperties;
 import com.pair.website.domain.Member;
 import com.pair.website.dto.BaseResponseDto;
 import com.pair.website.dto.LoginResponseDto;
 import com.pair.website.dto.kakao.KakaoTokenDto;
 import com.pair.website.dto.kakao.KakaoAccountDto;
+import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,6 +26,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 @Service
@@ -31,13 +35,19 @@ import java.util.Date;
 public class SocialLoginService {
 
     @Autowired
-    MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    private final TokenProvider tokenProvider;
 
     // 환경변수로 바꾸기
-    String KAKAO_CLIENT_ID = "07e15e7a3ed75284514269287e892394";
-    String KAKAO_REDIRECT_URI = "http://localhost:8080/api/oauth/kakao/callback";
+    @Value("${kakao.clientId}")
+    String KAKAO_CLIENT_ID;
+    @Value("${kakao.redirectUrl}")
+    String KAKAO_REDIRECT_URI;
 
-    public BaseResponseDto<?> kakaoLogin(String code) {
+    // 닉네임 중복처리를 위해 int max부터 내림차순으로 #id추가 ex)제리 #9999999
+    int maxID = 10000000;
+
+    public BaseResponseDto<?> kakaoLogin(String code, HttpServletResponse response) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getAccessToken(code).getAccess_token();
 
@@ -45,12 +55,16 @@ public class SocialLoginService {
         KakaoAccountDto kakaoAccountDto = getKakaoUserInfo(accessToken);
 
         // 3. 카카오ID로 회원가입 처리
-        String jwtToken = registerKakaoUserIfNeed(kakaoAccountDto);
+        Member member = registerKakaoUserIfNeed(kakaoAccountDto);
 
-        Member member = memberRepository.findByEmail(kakaoAccountDto.getKakao_account().getEmail())
-                .orElse(null);
+        // 4. member로 jwt 토큰 만들기
+        // createToken(member);
+        //tokenToHeaders(jwtToken, response);
 
-        LoginResponseDto loginResponseDto = LoginResponseDto.builder().loginSuccess(true).id(member.getId()).nickname(member.getNickname()).profileImage(member.getProfileImage()).token(jwtToken).createdAt(member.getCreatedAt()).build();
+        TokenDto tokenDto = tokenProvider.generateTokenDto(member);
+        tokenToHeaders(tokenDto, response);
+
+        LoginResponseDto loginResponseDto = LoginResponseDto.builder().loginSuccess(true).id(member.getId()).nickname(member.getNickname()).profileImage(member.getProfileImage()).createdAt(member.getCreatedAt()).build();
         return BaseResponseDto.success(loginResponseDto);
     }
 
@@ -122,23 +136,26 @@ public class SocialLoginService {
     }
 
     // 3. 카카오ID로 회원가입 처리
-    private String registerKakaoUserIfNeed(KakaoAccountDto kakaoAccountDto) {
+    private Member registerKakaoUserIfNeed(KakaoAccountDto kakaoAccountDto) {
 
         // DB 에 중복된 email이 있는지 확인
         String kakaoEmail = kakaoAccountDto.getKakao_account().getEmail();
         Member member = memberRepository.findByEmail(kakaoEmail)
                 .orElse(null);
 
+        maxID = maxID - 1;
+
         if (member == null) {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
-            member = Member.builder().email(kakaoEmail).nickname(kakaoName).profileImage(kakaoImage).password("password").build();
+            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #maxID").profileImage(kakaoImage).password("password").build();
             //비밀번호 암호화 로직 추가하기
 
             memberRepository.save(member);
         }
-        return createToken(member);
+
+        return member;
     }
 
     public String createToken(Member member) {
@@ -151,5 +168,11 @@ public class SocialLoginService {
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
         return jwtToken;
+    }
+
+    public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
+        response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
+        response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
+        response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
     }
 }

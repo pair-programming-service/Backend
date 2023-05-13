@@ -59,6 +59,7 @@ public class Member extends BaseTimeEntity {
     public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
         return passwordEncoder.matches(password, this.password);
     }
+
     public Member update(ProfileRequestDto requestDto) {
         this.nickname = requestDto.getNickname();
         this.profileImage = requestDto.getProfileImage();
