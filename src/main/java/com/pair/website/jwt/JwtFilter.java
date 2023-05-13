@@ -47,7 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
         Key key = Keys.hmacShaKeyFor(keyBytes);
 
         String jwt = resolveToken(request);
-        String refreshToken = request.getHeader("Refresh-Token");
+        String refreshToken = request.getHeader("refreshToken");
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
             Claims claims;
             try {
@@ -96,7 +96,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
-                response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
+                response.addHeader("refreshToken", tokenDto.getRefreshToken());
                 response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
     }
         filterChain.doFilter(request, response);

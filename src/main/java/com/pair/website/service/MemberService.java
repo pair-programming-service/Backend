@@ -30,6 +30,11 @@ public class MemberService {
             return BaseResponseDto.fail("DUPLICATED_NICKNAME",
                     "중복된 아이디입니다.");
         }
+
+        if(checkNickname(requestDto.getNickname()) != null) {
+            return BaseResponseDto.fail("ALREADY_NICKNAME",
+                    "이미 사용중인 닉네임 입니다.");
+        }
         Member member = Member.builder()
                 .email(requestDto.getEmail())
                 .nickname(requestDto.getNickname())
@@ -48,11 +53,6 @@ public class MemberService {
                         .build());
     }
 
-    public BaseResponseDto<?> nicknameCheck(String nickname){
-        Member member = memberRepository.findByNickname(nickname);
-        if(member == null) return BaseResponseDto.fail("ALREADY_NICKNAME","이미 사용중인 닉네임 입니다.");
-        return BaseResponseDto.success("사용가능한 닉네임 입니다.");
-    }
 
 
     @Transactional
@@ -110,10 +110,15 @@ public class MemberService {
         Optional<Member> optionalMember = memberRepository.findByEmail(email);
         return optionalMember.orElse(null);
     }
+    @Transactional(readOnly = true)
+    public Member checkNickname(String nickname) {
+        Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
+        return optionalMember.orElse(null);
+    }
 
     public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
-        response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
+        response.addHeader("refreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
     }
 }

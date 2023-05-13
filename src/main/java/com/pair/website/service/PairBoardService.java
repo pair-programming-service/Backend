@@ -75,12 +75,12 @@ public class PairBoardService {
 
     // 페어 목록 글 전체 보기
     @Transactional(readOnly = true)
-    public PageResponseDto<?> getAll(int page, int size, String keyword,String category, Boolean cLanguage,
+    public PageResponseDto<?> getAll(int page, int size, String keyword,String category, Boolean status,Boolean cLanguage,
                                      Boolean cSharp , Boolean cPlusPlus, Boolean javaScript,
                                      Boolean java, Boolean python, Boolean nodeJs, Boolean typeScript) {
         Pageable pageable = PageRequest.of(page, size); // 페이징 처리
         
-        Page<PairBoard> pairBoards = pairBoardRepository.findDynamicQuery(pageable, keyword, category,cLanguage, cSharp, cPlusPlus,
+        Page<PairBoard> pairBoards = pairBoardRepository.findDynamicQuery(pageable, keyword, category,status,cLanguage, cSharp, cPlusPlus,
                     javaScript, java, python, nodeJs, typeScript);
 
 
@@ -234,7 +234,7 @@ public class PairBoardService {
 
     @Transactional
     public Member validateMember(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+        if (!tokenProvider.validateToken(request.getHeader("refreshToken"))) {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();
