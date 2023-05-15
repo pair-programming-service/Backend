@@ -36,7 +36,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PairBoardRepository pairBoardRepository;
     private final PasswordEncoder passwordEncoder;
-    private AwsS3Uploader awsS3Uploader;
+    private final AwsS3Uploader awsS3Uploader;
 
 
     public BaseResponseDto<?> signup(@Valid MemberRequestDto requestDto) {
@@ -145,7 +145,6 @@ public class MemberService {
 
     @Transactional
     public BaseResponseDto<?> saveProfileImg(MultipartFile image, Member member) throws IOException {
-        System.out.println("Img 서비스 접근");
         if (!image.isEmpty()) {
             String storedFileName = awsS3Uploader.upload(image, "images");
             member.setProfileImage(storedFileName);
