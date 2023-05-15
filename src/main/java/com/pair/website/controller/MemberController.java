@@ -10,9 +10,11 @@ import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,5 +50,14 @@ public class MemberController {
         Member member = (Member) result.getData();
 
         return memberService.getProfile(member.getId());
+    }
+
+    @PostMapping(value = "/api/member/uploadImg")
+    public BaseResponseDto<?> uploadProfileImg(HttpServletRequest request, @RequestParam(value = "image") MultipartFile image) throws IOException {
+        BaseResponseDto<?> result = publicMethod.checkLogin(request);
+        if (!result.isSuccess()) return result;
+        Member member = (Member) result.getData();
+
+        return memberService.saveProfileImg(image, member);
     }
 }

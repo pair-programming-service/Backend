@@ -1,38 +1,39 @@
 package com.pair.website.service;
 
+import com.pair.website.configuration.s3.AwsS3Uploader;
 import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.*;
-import com.pair.website.dto.response.BoardAllResponseDto;
 import com.pair.website.dto.response.MemberResponseDto;
-import com.pair.website.dto.response.PairBoardSaveResponseDto;
 import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.MemberRepository;
 import com.pair.website.repository.PairBoardRepository;
-import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
     private final PairBoardRepository pairBoardRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AwsS3Uploader awsS3Uploader;
+
 
     public ResponseEntity<?> signup(@Valid MemberRequestDto requestDto) {
         if (isPresentMember(requestDto.getEmail()) != null) {
@@ -136,6 +137,23 @@ public class MemberService {
                 .githubLink(member.getGithubLink())
                 .createdAt(member.getCreatedAt())
                 .build());
+    }
+
+    @Transactional
+    public BaseResponseDto<?> saveProfileImg(MultipartFile image, Member member) throws IOException {
+        if (!image.isEmpty()) {
+            String storedFileName = awsS3Uploader.upload(image, "images");
+            member.setProfileImage(storedFileName);
+        }
+        return BaseResponseDto.success(MemberResponseDto.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .profileImage(member.getProfileImage())
+                .githubLink(member.getGithubLink())
+                .createdAt(member.getCreatedAt())
+                .build());
+
     }
 
     @Transactional(readOnly = true)
