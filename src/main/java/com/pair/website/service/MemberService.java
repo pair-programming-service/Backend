@@ -11,6 +11,8 @@ import com.pair.website.repository.MemberRepository;
 import com.pair.website.repository.PairBoardRepository;
 import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,15 +34,15 @@ public class MemberService {
     private final PairBoardRepository pairBoardRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public BaseResponseDto<?> signup(@Valid MemberRequestDto requestDto) {
+    public ResponseEntity<?> signup(@Valid MemberRequestDto requestDto) {
         if (isPresentMember(requestDto.getEmail()) != null) {
-            return BaseResponseDto.fail("DUPLICATED_NICKNAME",
-                    "중복된 아이디입니다.");
+            return new ResponseEntity(BaseResponseDto.fail("DUPLICATED_EMAIL",
+                    "중복된 이메일입니다."), HttpStatus.BAD_REQUEST);
         }
 
-        if (checkNickname(requestDto.getNickname()) != null) {
-            return BaseResponseDto.fail("ALREADY_NICKNAME",
-                    "이미 사용중인 닉네임 입니다.");
+        if(checkNickname(requestDto.getNickname()) != null) {
+            return new ResponseEntity(BaseResponseDto.fail("DUPLICATED_NICKNAME",
+                    "중복된 닉네임입니다."), HttpStatus.BAD_REQUEST);
         }
         Member member = Member.builder()
                 .email(requestDto.getEmail())
@@ -49,7 +51,7 @@ public class MemberService {
                 .build();
         memberRepository.save(member);
 
-        return BaseResponseDto.success(
+        return new ResponseEntity(BaseResponseDto.success(
                 MemberResponseDto.builder()
                         .id(member.getId())
                         .email(member.getEmail())
@@ -57,7 +59,7 @@ public class MemberService {
                         .profileImage(member.getProfileImage())
                         .githubLink(member.getGithubLink())
                         .createdAt(member.getCreatedAt())
-                        .build());
+                        .build()),HttpStatus.OK);
     }
 
 
