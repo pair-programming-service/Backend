@@ -76,31 +76,32 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        }else if(refreshToken!= null && tokenProvider.validateToken(refreshToken)){
+        } else if (refreshToken != null && tokenProvider.validateToken(refreshToken)) {
             Claims claims;
             try {
                 claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
             } catch (ExpiredJwtException e) {
                 claims = e.getClaims();
             }
-                TokenDto tokenDto = tokenProvider.generateTokenDto(refreshToken); //token 재발금
-                String subject = claims.getSubject();
-                Collection<? extends GrantedAuthority> authorities =
-                        Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                                .map(SimpleGrantedAuthority::new)
-                                .collect(Collectors.toList());
+            TokenDto tokenDto = tokenProvider.generateTokenDto(refreshToken); //token 재발금
+            String subject = claims.getSubject();
+            Collection<? extends GrantedAuthority> authorities =
+                    Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList());
 
-                UserDetails principal = userDetailsService.loadUserByUsername(subject);
+            UserDetails principal = userDetailsService.loadUserByUsername(subject);
 
-                Authentication authentication = new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
-                response.addHeader("refreshToken", tokenDto.getRefreshToken());
-                response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
-    }
+            response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
+            response.addHeader("refreshToken", tokenDto.getRefreshToken());
+            response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
+        }
         filterChain.doFilter(request, response);
     }
+
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {

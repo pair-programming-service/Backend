@@ -4,8 +4,6 @@ import com.pair.website.jwt.AccessDeniedHandlerException;
 import com.pair.website.jwt.AuthenticationEntryPointException;
 import com.pair.website.jwt.TokenProvider;
 import com.pair.website.service.UserDetailsServiceImpl;
-import com.pair.website.jwt.CustomAuthenticationEntryPoint;
-import com.pair.website.jwt.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -21,7 +19,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -66,7 +63,7 @@ public class SecurityConfiguration {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+//                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .accessDeniedHandler(accessDeniedHandlerException)
                 .and()
                 // 인증
@@ -84,10 +81,6 @@ public class SecurityConfiguration {
                 .httpBasic().disable()
                 .formLogin().disable()
                 .addFilter(corsFilter);
-
-
-        http.addFilterBefore(new JwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }

@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pair.website.dto.ProfileRequestDto;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -41,6 +42,7 @@ public class Member extends BaseTimeEntity {
     @Column
     private String githubLink;
 
+    @JsonBackReference //순환참조 방지
     @OneToMany(mappedBy = "member")
     private List<PairBoard> pairBoards = new ArrayList<>();
 

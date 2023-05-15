@@ -1,10 +1,14 @@
 package com.pair.website.service;
 
 import com.pair.website.domain.Member;
+import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.*;
+import com.pair.website.dto.response.BoardAllResponseDto;
 import com.pair.website.dto.response.MemberResponseDto;
+import com.pair.website.dto.response.PairBoardSaveResponseDto;
 import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.MemberRepository;
+import com.pair.website.repository.PairBoardRepository;
 import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -23,6 +29,7 @@ public class MemberService {
 
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
+    private final PairBoardRepository pairBoardRepository;
     private final PasswordEncoder passwordEncoder;
 
     public BaseResponseDto<?> signup(@Valid MemberRequestDto requestDto) {
@@ -31,7 +38,7 @@ public class MemberService {
                     "중복된 아이디입니다.");
         }
 
-        if(checkNickname(requestDto.getNickname()) != null) {
+        if (checkNickname(requestDto.getNickname()) != null) {
             return BaseResponseDto.fail("ALREADY_NICKNAME",
                     "이미 사용중인 닉네임 입니다.");
         }
@@ -52,7 +59,6 @@ public class MemberService {
                         .createdAt(member.getCreatedAt())
                         .build());
     }
-
 
 
     @Transactional
@@ -83,9 +89,34 @@ public class MemberService {
         );
     }
 
+    // 마이페이지 조회
+    public BaseResponseDto<?> getProfile(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("NOT_FOUND_MEMBER")
+        );
+
+        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member.getId());
+        // List<BoardAllResponseDto> responseDtos = new ArrayList<>();
+        List<BoardListResponseDto> boardListResponseDtos = new ArrayList<>();
+
+        for (PairBoard board : boards) {
+            boardListResponseDtos.add(BoardListResponseDto.builder().title(board.getTitle()).content(board.getContent()).category(board.getCategory()).build());
+        }
+
+        return BaseResponseDto.success(MemberResponseDto.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .profileImage(member.getProfileImage())
+                .githubLink(member.getGithubLink())
+                .createdAt(member.getCreatedAt())
+                .boardList(boardListResponseDtos)
+                .build());
+    }
+
     // 프로필 수정
     @Transactional
-    public BaseResponseDto<?> profileUpdate(ProfileRequestDto requestDto,Long id){
+    public BaseResponseDto<?> profileUpdate(ProfileRequestDto requestDto, Long id) {
         Member member = memberRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("NOT_FOUND_MEMBER")
         );
@@ -110,6 +141,7 @@ public class MemberService {
         Optional<Member> optionalMember = memberRepository.findByEmail(email);
         return optionalMember.orElse(null);
     }
+
     @Transactional(readOnly = true)
     public Member checkNickname(String nickname) {
         Optional<Member> optionalMember = memberRepository.findByNickname(nickname);

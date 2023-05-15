@@ -1,11 +1,8 @@
 package com.pair.website.service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pair.website.dto.TokenDto;
-import com.pair.website.jwt.JwtProperties;
 import com.pair.website.domain.Member;
 import com.pair.website.dto.BaseResponseDto;
 import com.pair.website.dto.LoginResponseDto;
@@ -27,7 +24,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -149,7 +145,7 @@ public class SocialLoginService {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
-            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #maxID").profileImage(kakaoImage).password("password").build();
+            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #" + maxID).profileImage(kakaoImage).password("password").build();
             //비밀번호 암호화 로직 추가하기
 
             memberRepository.save(member);
@@ -158,21 +154,11 @@ public class SocialLoginService {
         return member;
     }
 
-    public String createToken(Member member) {
-        // Jwt 생성 후 헤더에 추가해서 보내줌
-        String jwtToken = JWT.create()
-                .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                .withClaim("id", member.getId())
-                .withClaim("nickname", member.getNickname())
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-
-        return jwtToken;
-    }
-
     public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
         response.addHeader("refreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
+        System.out.println("Bearer " + tokenDto.getAccessToken());
+        System.out.println(tokenDto.getRefreshToken());
     }
 }

@@ -21,7 +21,7 @@ public class MemberController {
 
 
     @PostMapping("/api/member/signup")
-    public BaseResponseDto<?> signup(@RequestBody MemberRequestDto memberRequestDto){
+    public BaseResponseDto<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
         return memberService.signup(memberRequestDto);
     }
 
@@ -29,12 +29,23 @@ public class MemberController {
     public BaseResponseDto<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         return memberService.login(loginRequestDto, response);
     }
-    @PutMapping("/api/member/update")
-    public BaseResponseDto<?> profileUpdate(@RequestBody ProfileRequestDto requestDto, HttpServletRequest request){
-        BaseResponseDto<?> result = publicMethod.checkLogin(request);
-        if(!result.isSuccess()) return result;
-        Member member = (Member)result.getData();
 
-        return memberService.profileUpdate(requestDto,member.getId());
+    @PutMapping("/api/member/update")
+    public BaseResponseDto<?> profileUpdate(@RequestBody ProfileRequestDto requestDto, HttpServletRequest request) {
+        BaseResponseDto<?> result = publicMethod.checkLogin(request);
+        if (!result.isSuccess()) return result;
+        Member member = (Member) result.getData();
+
+        return memberService.profileUpdate(requestDto, member.getId());
+    }
+
+    @GetMapping("/api/member/detail")
+    public BaseResponseDto<?> getProfile(HttpServletRequest request) {
+
+        BaseResponseDto<?> result = publicMethod.checkLogin(request);
+        if (!result.isSuccess()) return result;
+        Member member = (Member) result.getData();
+
+        return memberService.getProfile(member.getId());
     }
 }

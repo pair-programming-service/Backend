@@ -2,7 +2,10 @@ package com.pair.website.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.ser.Serializers.Base;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.*;
@@ -20,8 +23,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {@Index(name = "title_idx", columnList = "title"),
-                  @Index(name = "content_idx", columnList = "content"),
-                  @Index(name = "category_idx", columnList = "category")})
+        @Index(name = "content_idx", columnList = "content"),
+        @Index(name = "category_idx", columnList = "category")})
 public class PairBoard extends BaseTimeEntity {
 
     @Id
@@ -29,6 +32,7 @@ public class PairBoard extends BaseTimeEntity {
     @Column(name = "pair_id")
     private Long id;
 
+    @JsonManagedReference // 순환참조 방지
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -66,9 +70,9 @@ public class PairBoard extends BaseTimeEntity {
     private int viewCount;
 
     public void update(BoardLanguage boardLanguage, String title,
-        String content,
-        String ide, String category, String runningTime, String proceed, LocalDate runningDate,
-        Boolean status, int viewCount) {
+                       String content,
+                       String ide, String category, String runningTime, String proceed, LocalDate runningDate,
+                       Boolean status, int viewCount) {
         this.boardLanguage = boardLanguage;
         this.title = title;
         this.content = content;
