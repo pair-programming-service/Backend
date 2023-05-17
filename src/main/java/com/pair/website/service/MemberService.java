@@ -4,13 +4,10 @@ import com.pair.website.configuration.s3.AwsS3Uploader;
 import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.*;
-import com.pair.website.dto.response.BoardAllResponseDto;
 import com.pair.website.dto.response.MemberResponseDto;
-import com.pair.website.dto.response.PairBoardSaveResponseDto;
 import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.MemberRepository;
 import com.pair.website.repository.PairBoardRepository;
-import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -123,32 +119,20 @@ public class MemberService {
 
     // 프로필 수정
     @Transactional
-    public BaseResponseDto<?> profileUpdate(ProfileRequestDto requestDto, Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("NOT_FOUND_MEMBER")
-        );
-        member.update(ProfileRequestDto.builder()
-                .nickname(requestDto.getNickname())
-                .profileImage(requestDto.getProfileImage())
-                .githubLink(requestDto.getGithubLink())
-                .build());
-
-        return BaseResponseDto.success(MemberResponseDto.builder()
-                .id(member.getId())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
-                .githubLink(member.getGithubLink())
-                .createdAt(member.getCreatedAt())
-                .build());
-    }
-
-    @Transactional
-    public BaseResponseDto<?> saveProfileImg(MultipartFile image, Member member) throws IOException {
+    public BaseResponseDto<?> profileUpdate(MultipartFile image, ProfileRequestDto requestDto, Member member) throws IOException {
         if (!image.isEmpty()) {
             String storedFileName = awsS3Uploader.upload(image, "images");
             member.setProfileImage(storedFileName);
         }
+
+        member.update(ProfileRequestDto.builder()
+                .nickname(requestDto.getNickname())
+                .profileImage(member.getProfileImage())
+                .githubLink(requestDto.getGithubLink())
+                .build());
+
+        memberRepository.save(member);
+
         return BaseResponseDto.success(MemberResponseDto.builder()
                 .id(member.getId())
                 .email(member.getEmail())
@@ -157,7 +141,6 @@ public class MemberService {
                 .githubLink(member.getGithubLink())
                 .createdAt(member.getCreatedAt())
                 .build());
-
     }
 
     @Transactional(readOnly = true)
