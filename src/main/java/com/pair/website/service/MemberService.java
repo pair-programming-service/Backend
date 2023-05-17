@@ -10,6 +10,8 @@ import com.pair.website.repository.MemberRepository;
 import com.pair.website.repository.PairBoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,15 +37,15 @@ public class MemberService {
     private final AwsS3Uploader awsS3Uploader;
 
 
-    public BaseResponseDto<?> signup(@Valid MemberRequestDto requestDto) {
+    public ResponseEntity<?> signup(@Valid MemberRequestDto requestDto) {
         if (isPresentMember(requestDto.getEmail()) != null) {
-            return BaseResponseDto.fail("DUPLICATED_NICKNAME",
-                    "중복된 아이디입니다.");
+            return new ResponseEntity<>(BaseResponseDto.fail("DUPLICATED_NICKNAME",
+                    "중복된 아이디입니다."), HttpStatus.BAD_REQUEST);
         }
 
         if (checkNickname(requestDto.getNickname()) != null) {
-            return BaseResponseDto.fail("ALREADY_NICKNAME",
-                    "이미 사용중인 닉네임 입니다.");
+            return new ResponseEntity<>(BaseResponseDto.fail("ALREADY_NICKNAME",
+                    "이미 사용중인 닉네임 입니다."), HttpStatus.BAD_REQUEST);
         }
         Member member = Member.builder()
                 .email(requestDto.getEmail())
@@ -52,7 +54,7 @@ public class MemberService {
                 .build();
         memberRepository.save(member);
 
-        return BaseResponseDto.success(
+        return new ResponseEntity<>(BaseResponseDto.success(
                 MemberResponseDto.builder()
                         .id(member.getId())
                         .email(member.getEmail())
@@ -60,7 +62,7 @@ public class MemberService {
                         .profileImage(member.getProfileImage())
                         .githubLink(member.getGithubLink())
                         .createdAt(member.getCreatedAt())
-                        .build());
+                        .build()),HttpStatus.OK);
     }
 
 
@@ -98,13 +100,7 @@ public class MemberService {
                 () -> new NullPointerException("NOT_FOUND_MEMBER")
         );
 
-        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member.getId());
-        // List<BoardAllResponseDto> responseDtos = new ArrayList<>();
-        List<BoardListResponseDto> boardListResponseDtos = new ArrayList<>();
-
-        for (PairBoard board : boards) {
-            boardListResponseDtos.add(BoardListResponseDto.builder().title(board.getTitle()).content(board.getContent()).category(board.getCategory()).build());
-        }
+        List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
 
         return BaseResponseDto.success(MemberResponseDto.builder()
                 .id(member.getId())
@@ -130,8 +126,8 @@ public class MemberService {
                 .profileImage(member.getProfileImage())
                 .githubLink(requestDto.getGithubLink())
                 .build());
-
         memberRepository.save(member);
+        List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
 
         return BaseResponseDto.success(MemberResponseDto.builder()
                 .id(member.getId())
@@ -139,6 +135,7 @@ public class MemberService {
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .githubLink(member.getGithubLink())
+                .boardList(boardListResponseDtos)
                 .createdAt(member.getCreatedAt())
                 .build());
     }
@@ -153,6 +150,16 @@ public class MemberService {
     public Member checkNickname(String nickname) {
         Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
         return optionalMember.orElse(null);
+    }
+
+    public List<BoardListResponseDto> boardList(Long member_id) {
+        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member_id);
+        List<BoardListResponseDto> boardListResponseDtos = new ArrayList<>();
+
+        for (PairBoard board : boards) {
+            boardListResponseDtos.add(BoardListResponseDto.builder().title(board.getTitle()).content(board.getContent()).category(board.getCategory()).build());
+        }
+        return boardListResponseDtos;
     }
 
     public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
