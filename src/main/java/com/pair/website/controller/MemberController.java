@@ -8,6 +8,7 @@ import com.pair.website.dto.ProfileRequestDto;
 import com.pair.website.service.MemberService;
 import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +24,7 @@ public class MemberController {
 
 
     @PostMapping("/api/member/signup")
-    public BaseResponseDto<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
+    public ResponseEntity<?> signup(@RequestBody MemberRequestDto memberRequestDto){
         return memberService.signup(memberRequestDto);
     }
 
