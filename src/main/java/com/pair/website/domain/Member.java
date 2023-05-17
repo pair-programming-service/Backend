@@ -60,11 +60,9 @@ public class Member extends BaseTimeEntity {
         return passwordEncoder.matches(password, this.password);
     }
 
-    public Member update(ProfileRequestDto requestDto) {
+    public void update(ProfileRequestDto requestDto) {
         this.nickname = requestDto.getNickname();
         this.profileImage = requestDto.getProfileImage();
         this.githubLink = requestDto.getGithubLink();
-
-        return this;
     }
 }
