@@ -9,5 +9,5 @@ public interface BoardLanguageRepository extends JpaRepository<BoardLanguage, Lo
 
     Optional<BoardLanguage> findById(Long id);
 
-    BoardLanguage findByPairBoardId(Long id);
+    Optional<BoardLanguage> findByPairBoardId(Long id);
 }

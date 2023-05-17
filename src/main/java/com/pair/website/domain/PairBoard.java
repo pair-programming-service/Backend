@@ -85,4 +85,8 @@ public class PairBoard extends BaseTimeEntity {
         this.viewCount = viewCount;
     }
 
+    public void update(int viewCount){
+        this.viewCount = viewCount;
+    }
+
 }
