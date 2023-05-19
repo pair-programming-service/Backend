@@ -24,7 +24,7 @@ public class MemberController {
 
 
     @PostMapping("/api/member/signup")
-    public ResponseEntity<?> signup(@RequestBody MemberRequestDto memberRequestDto){
+    public ResponseEntity<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
         return memberService.signup(memberRequestDto);
     }
 
@@ -34,12 +34,12 @@ public class MemberController {
     }
 
     @PutMapping("/api/member/update")
-    public BaseResponseDto<?> profileUpdate(@RequestPart ProfileRequestDto requestDto, HttpServletRequest request , @RequestPart(value = "image") MultipartFile image) throws IOException {
+    public BaseResponseDto<?> profileUpdate(@RequestPart ProfileRequestDto requestDto, HttpServletRequest request, @RequestPart(value = "image") MultipartFile image) throws IOException {
         BaseResponseDto<?> result = publicMethod.checkLogin(request);
         if (!result.isSuccess()) return result;
         Member member = (Member) result.getData();
 
-        return memberService.profileUpdate(image, requestDto, member);
+        return memberService.profileUpdate(image, requestDto, member.getId());
     }
 
     @GetMapping("/api/member/detail")

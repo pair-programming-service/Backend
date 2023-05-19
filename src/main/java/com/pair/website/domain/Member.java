@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pair.website.dto.ProfileRequestDto;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Getter
@@ -60,9 +61,9 @@ public class Member extends BaseTimeEntity {
         return passwordEncoder.matches(password, this.password);
     }
 
-    public void update(ProfileRequestDto requestDto) {
+    public void update(ProfileRequestDto requestDto, String storedFileName) {
         this.nickname = requestDto.getNickname();
-        this.profileImage = requestDto.getProfileImage();
+        this.profileImage = storedFileName;
         this.githubLink = requestDto.getGithubLink();
     }
 }

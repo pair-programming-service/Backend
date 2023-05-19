@@ -158,7 +158,5 @@ public class SocialLoginService {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
         response.addHeader("refreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
-        System.out.println("Bearer " + tokenDto.getAccessToken());
-        System.out.println(tokenDto.getRefreshToken());
     }
 }
