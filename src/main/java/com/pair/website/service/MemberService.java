@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -37,13 +38,13 @@ public class MemberService {
 
     public ResponseEntity<?> signup(@Valid MemberRequestDto requestDto) {
         if (isPresentMember(requestDto.getEmail()) != null) {
-            return new ResponseEntity(BaseResponseDto.fail("DUPLICATED_EMAIL",
-                    "중복된 이메일입니다."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(BaseResponseDto.fail("DUPLICATED_NICKNAME",
+                    "중복된 아이디입니다."), HttpStatus.BAD_REQUEST);
         }
 
-        if(checkNickname(requestDto.getNickname()) != null) {
-            return new ResponseEntity(BaseResponseDto.fail("DUPLICATED_NICKNAME",
-                    "중복된 닉네임입니다."), HttpStatus.BAD_REQUEST);
+        if (checkNickname(requestDto.getNickname()) != null) {
+            return new ResponseEntity<>(BaseResponseDto.fail("ALREADY_NICKNAME",
+                    "이미 사용중인 닉네임 입니다."), HttpStatus.BAD_REQUEST);
         }
         Member member = Member.builder()
                 .email(requestDto.getEmail())
@@ -52,7 +53,7 @@ public class MemberService {
                 .build();
         memberRepository.save(member);
 
-        return new ResponseEntity(BaseResponseDto.success(
+        return new ResponseEntity<>(BaseResponseDto.success(
                 MemberResponseDto.builder()
                         .id(member.getId())
                         .email(member.getEmail())
@@ -98,13 +99,7 @@ public class MemberService {
                 () -> new NullPointerException("NOT_FOUND_MEMBER")
         );
 
-        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member.getId());
-        // List<BoardAllResponseDto> responseDtos = new ArrayList<>();
-        List<BoardListResponseDto> boardListResponseDtos = new ArrayList<>();
-
-        for (PairBoard board : boards) {
-            boardListResponseDtos.add(BoardListResponseDto.builder().title(board.getTitle()).content(board.getContent()).category(board.getCategory()).build());
-        }
+        List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
 
         return BaseResponseDto.success(MemberResponseDto.builder()
                 .id(member.getId())
@@ -119,41 +114,29 @@ public class MemberService {
 
     // 프로필 수정
     @Transactional
-    public BaseResponseDto<?> profileUpdate(ProfileRequestDto requestDto, Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("NOT_FOUND_MEMBER")
-        );
-        member.update(ProfileRequestDto.builder()
-                .nickname(requestDto.getNickname())
-                .profileImage(requestDto.getProfileImage())
-                .githubLink(requestDto.getGithubLink())
-                .build());
-
-        return BaseResponseDto.success(MemberResponseDto.builder()
-                .id(member.getId())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
-                .githubLink(member.getGithubLink())
-                .createdAt(member.getCreatedAt())
-                .build());
-    }
-
-    @Transactional
-    public BaseResponseDto<?> saveProfileImg(MultipartFile image, Member member) throws IOException {
+    public BaseResponseDto<?> profileUpdate(MultipartFile image, ProfileRequestDto requestDto, Member member) throws IOException {
         if (!image.isEmpty()) {
             String storedFileName = awsS3Uploader.upload(image, "images");
             member.setProfileImage(storedFileName);
         }
+
+        member.update(ProfileRequestDto.builder()
+                .nickname(requestDto.getNickname())
+                .profileImage(member.getProfileImage())
+                .githubLink(requestDto.getGithubLink())
+                .build());
+        memberRepository.save(member);
+        List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
+
         return BaseResponseDto.success(MemberResponseDto.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .githubLink(member.getGithubLink())
+                .boardList(boardListResponseDtos)
                 .createdAt(member.getCreatedAt())
                 .build());
-
     }
 
     @Transactional(readOnly = true)
@@ -166,6 +149,16 @@ public class MemberService {
     public Member checkNickname(String nickname) {
         Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
         return optionalMember.orElse(null);
+    }
+
+    public List<BoardListResponseDto> boardList(Long member_id) {
+        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member_id);
+        List<BoardListResponseDto> boardListResponseDtos = new ArrayList<>();
+
+        for (PairBoard board : boards) {
+            boardListResponseDtos.add(BoardListResponseDto.builder().title(board.getTitle()).content(board.getContent()).category(board.getCategory()).build());
+        }
+        return boardListResponseDtos;
     }
 
     public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {

@@ -1,23 +1,19 @@
 package com.pair.website.controller;
 
+import com.pair.website.domain.Member;
 import com.pair.website.dto.BaseResponseDto;
 import com.pair.website.dto.PairBoardSaveRequestDto;
 import com.pair.website.dto.response.PageResponseDto;
 import com.pair.website.service.PairBoardService;
+import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.*;
 
-import com.pair.website.dto.BaseResponseDto;
-import com.pair.website.service.PairBoardService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-
-import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
@@ -26,13 +22,16 @@ public class PairBoardController {
 
 
     private final PairBoardService pairBoardService;
+    private final PublicMethod publicMethod;
 
     // 페어 게시물 작성 API
     @PostMapping("/api/board")
     public BaseResponseDto<?> save(
             @RequestBody PairBoardSaveRequestDto requestDto, HttpServletRequest request) {
-
-        return pairBoardService.save(requestDto,request);
+        BaseResponseDto<?> result = publicMethod.checkLogin(request);
+        if (!result.isSuccess()) return result;
+        Member member = (Member) result.getData();
+        return pairBoardService.save(member,requestDto);
     }
 
     @GetMapping("/api/board/all")
@@ -56,10 +55,12 @@ public class PairBoardController {
 
     // 페어 게시물 수정 API
     @PutMapping("/api/board/{id}")
-    public BaseResponseDto<?> update(@RequestBody PairBoardSaveRequestDto requestDto,
-        @PathVariable Long id) {
-
-        return pairBoardService.update(requestDto, id);
+    public BaseResponseDto<?> update(HttpServletRequest request, @RequestBody PairBoardSaveRequestDto requestDto,
+                                    @PathVariable Long id) {
+        BaseResponseDto<?> result = publicMethod.checkLogin(request);
+        if (!result.isSuccess()) return result;
+        Member member = (Member) result.getData();
+        return pairBoardService.update(member,requestDto, id);
     }
 
     // 게시물 삭제

@@ -31,15 +31,9 @@ import java.util.Optional;
 public class PairBoardService {
     private final PairBoardRepository pairBoardRepository;
     private final BoardLanguageRepository boardLanguageRepository;
-    private final TokenProvider tokenProvider;
 
     @Transactional
-    public BaseResponseDto<?> save(PairBoardSaveRequestDto requestDto, HttpServletRequest request) {
-        Member member = validateMember(request);
-        if(member == null) return BaseResponseDto.fail("INVALID_TOKEN","토큰이 유효하지 않습니다.");
-        if(request.getHeader("Authorization") == null)
-            return BaseResponseDto.fail("MEMBER_NOT_FOUND","로그인이 필요합니다.");
-
+    public BaseResponseDto<?> save(Member member,PairBoardSaveRequestDto requestDto) {
         PairBoard pairBoard = requestDto.toEntity(member);
         pairBoardRepository.save(pairBoard);
 
@@ -56,12 +50,11 @@ public class PairBoardService {
                 .nodeJs(boardLanguageResponseDto.getNodeJs())
                 .typeScript(boardLanguageResponseDto.getTypeScript()).build();
 
-        log.info("boardLanguage : {}", boardLanguage);
         boardLanguageRepository.save(boardLanguage);
 
         PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder()
 
-            .id(pairBoard.getId()).boardLanguageId(boardLanguage.getId()).member(member.getId())
+            .id(pairBoard.getId()).boardLanguageId(boardLanguage.getId()).member(member.getNickname())
             .title(pairBoard.getTitle()).content(pairBoard.getContent()).ide(pairBoard.getIde())
             .proceed(pairBoard.getProceed()).runningTime(pairBoard.getRunningTime())
             .category(pairBoard.getCategory()).runningDate(pairBoard.getRunningDate())
@@ -92,7 +85,7 @@ public class PairBoardService {
             List<String> languageList = new ArrayList<>();
             languageCheck(boardLanguage, languageList);
             boardAllResponseDtos.add(
-                    BoardAllResponseDto.builder().id(pairBoard.getId()).title(pairBoard.getTitle())
+                    BoardAllResponseDto.builder().id(pairBoard.getId()).nickname(pairBoard.getMember().getNickname()).title(pairBoard.getTitle())
                             .content(pairBoard.getContent()).ide(pairBoard.getIde())
                             .runningTime(pairBoard.getRunningTime()).proceed(pairBoard.getProceed())
                             .category(pairBoard.getCategory()).language(languageList)
@@ -103,16 +96,18 @@ public class PairBoardService {
         return PageResponseDto.success(boardAllResponseDtos,pairBoards.getTotalPages());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public BaseResponseDto<?> detail(Long id) {
         PairBoard pairBoard = pairBoardRepository.findById(id)
                 .orElseThrow(() -> new NullPointerException("NOT_FOUND_BOARD"));
-        Optional<BoardLanguage> boardLanguage = boardLanguageRepository.findById(id);
+        Optional<BoardLanguage> boardLanguage = boardLanguageRepository.findByPairBoardId(id);
         List<String> languageList = new ArrayList<>();
         languageCheck(boardLanguage, languageList);
 
+        pairBoard.update(pairBoard.getViewCount() + 1);
+
         return BaseResponseDto.success(
-                BoardAllResponseDto.builder().id(pairBoard.getId()).title(pairBoard.getTitle())
+                BoardAllResponseDto.builder().id(pairBoard.getId()).nickname(pairBoard.getMember().getNickname()).title(pairBoard.getTitle())
                         .content(pairBoard.getContent()).ide(pairBoard.getIde())
                         .runningTime(pairBoard.getRunningTime()).proceed(pairBoard.getProceed())
                         .category(pairBoard.getCategory()).language(languageList)
@@ -122,13 +117,15 @@ public class PairBoardService {
     }
 
     @Transactional
-    public BaseResponseDto<?> update(PairBoardSaveRequestDto requestDto, Long id) {
-
+    public BaseResponseDto<?> update(Member member,PairBoardSaveRequestDto requestDto, Long id) {
         PairBoard pairBoard = pairBoardRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
 
         BoardLanguage boardLanguage = boardLanguageRepository.findById(
                 pairBoard.getBoardLanguage().getId()).orElseThrow(IllegalArgumentException::new);
+
+        if(!member.getId().equals(pairBoard.getMember().getId()))
+            return BaseResponseDto.fail("ONLY_THE_AUTHOR_CAN_EDIT","작성자만 수정 가능합니다.");
 
         List<String> languageList = requestDto.getLanguage();
         BoardLanguageResponseDto boardLanguageResponseDto = getBoardLanguageResponseDto(
@@ -146,7 +143,7 @@ public class PairBoardService {
                 pairBoard.getViewCount());
 
         PairBoardSaveResponseDto responseDto = PairBoardSaveResponseDto.builder()
-                .id(pairBoard.getId()).boardLanguageId(boardLanguage.getId())
+                .id(pairBoard.getId()).member(member.getNickname()).boardLanguageId(boardLanguage.getId())
                 .title(pairBoard.getTitle()).content(pairBoard.getContent()).ide(pairBoard.getIde())
                 .proceed(pairBoard.getProceed()).runningTime(pairBoard.getRunningTime())
                 .category(pairBoard.getCategory()).runningDate(pairBoard.getRunningDate())
@@ -163,7 +160,9 @@ public class PairBoardService {
     public BaseResponseDto<?> deleteBoard(Long id) {
         Optional<PairBoard> pairBoard = pairBoardRepository.findById(id);
         if (!pairBoard.isPresent()) return BaseResponseDto.fail("NOT_FOUND_BOARD", "게시물을 찾을 수 없습니다.");
-        BoardLanguage boardLanguage = boardLanguageRepository.findByPairBoardId(id);
+        BoardLanguage boardLanguage = boardLanguageRepository.findByPairBoardId(id).orElseThrow(
+                () -> new IllegalArgumentException("게시물을 찾을 수 없습니다.")
+        );
 
         pairBoardRepository.deleteById(id);
         boardLanguageRepository.delete(boardLanguage);
@@ -230,14 +229,6 @@ public class PairBoardService {
             }
         }
         return boardLanguageResponseDto;
-    }
-
-    @Transactional
-    public Member validateMember(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("refreshToken"))) {
-            return null;
-        }
-        return tokenProvider.getMemberFromAuthentication();
     }
 
 }

@@ -22,7 +22,7 @@ import lombok.Setter;
 public class PairBoardSaveResponseDto {
 
     private Long id;
-    private Long member;
+    private String member;
     private Long boardLanguageId;
     private String title;
     private String content;

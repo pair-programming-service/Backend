@@ -34,12 +34,12 @@ public class MemberController {
     }
 
     @PutMapping("/api/member/update")
-    public BaseResponseDto<?> profileUpdate(@RequestBody ProfileRequestDto requestDto, HttpServletRequest request) {
+    public BaseResponseDto<?> profileUpdate(@RequestPart ProfileRequestDto requestDto, HttpServletRequest request , @RequestPart(value = "image") MultipartFile image) throws IOException {
         BaseResponseDto<?> result = publicMethod.checkLogin(request);
         if (!result.isSuccess()) return result;
         Member member = (Member) result.getData();
 
-        return memberService.profileUpdate(requestDto, member.getId());
+        return memberService.profileUpdate(image, requestDto, member);
     }
 
     @GetMapping("/api/member/detail")
@@ -50,14 +50,5 @@ public class MemberController {
         Member member = (Member) result.getData();
 
         return memberService.getProfile(member.getId());
-    }
-
-    @PostMapping(value = "/api/member/uploadImg")
-    public BaseResponseDto<?> uploadProfileImg(HttpServletRequest request, @RequestParam(value = "image") MultipartFile image) throws IOException {
-        BaseResponseDto<?> result = publicMethod.checkLogin(request);
-        if (!result.isSuccess()) return result;
-        Member member = (Member) result.getData();
-
-        return memberService.saveProfileImg(image, member);
     }
 }
