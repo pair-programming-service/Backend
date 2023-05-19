@@ -61,7 +61,7 @@ public class MemberService {
                         .profileImage(member.getProfileImage())
                         .githubLink(member.getGithubLink())
                         .createdAt(member.getCreatedAt())
-                        .build()),HttpStatus.OK);
+                        .build()), HttpStatus.OK);
     }
 
 
@@ -114,18 +114,21 @@ public class MemberService {
 
     // 프로필 수정
     @Transactional
-    public BaseResponseDto<?> profileUpdate(MultipartFile image, ProfileRequestDto requestDto, Member member) throws IOException {
+    public BaseResponseDto<?> profileUpdate(MultipartFile image, ProfileRequestDto requestDto, Long id) throws IOException {
+        Member member = memberRepository.findById(id).orElseThrow(
+                () -> new NullPointerException("NOT_FOUND_MEMBER")
+        );
+        String storedFileName = null;
         if (!image.isEmpty()) {
-            String storedFileName = awsS3Uploader.upload(image, "images");
+            storedFileName = awsS3Uploader.upload(image, "images");
             member.setProfileImage(storedFileName);
         }
 
         member.update(ProfileRequestDto.builder()
                 .nickname(requestDto.getNickname())
-                .profileImage(member.getProfileImage())
                 .githubLink(requestDto.getGithubLink())
-                .build());
-        memberRepository.save(member);
+                .build(), storedFileName);
+
         List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
 
         return BaseResponseDto.success(MemberResponseDto.builder()
