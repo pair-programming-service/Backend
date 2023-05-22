@@ -18,30 +18,31 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SocialLoginService {
 
-    @Autowired
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     // 환경변수로 바꾸기
     @Value("${kakao.clientId}")
     String KAKAO_CLIENT_ID;
     @Value("${kakao.redirectUrl}")
     String KAKAO_REDIRECT_URI;
-
-    // 닉네임 중복처리를 위해 int max부터 내림차순으로 #id추가 ex)제리 #9999999
-    int maxID = 10000000;
 
     public BaseResponseDto<?> kakaoLogin(String code, HttpServletResponse response) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -139,14 +140,20 @@ public class SocialLoginService {
         Member member = memberRepository.findByEmail(kakaoEmail)
                 .orElse(null);
 
-        maxID = maxID - 1;
 
         if (member == null) {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
-            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #" + maxID).profileImage(kakaoImage).password("password").build();
-            //비밀번호 암호화 로직 추가하기
+
+            // 닉네임 중복확인
+            while (checkNickname(kakaoName) != null) {
+                kakaoName += " #" + randomNumber();
+            }
+
+            // random password 생성
+            String randPassword = randomString();
+            member = Member.builder().email(kakaoEmail).nickname(kakaoName).profileImage(kakaoImage).password(passwordEncoder.encode(randPassword)).build();
 
             memberRepository.save(member);
         }
@@ -159,4 +166,40 @@ public class SocialLoginService {
         response.addHeader("refreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
     }
+
+    // 카카오 로그인 비밀번호 암호화 전 랜덤 비밀번호 생성
+    public String randomString() {
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+        Random random = new Random();
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return generatedString;
+    }
+
+    // 닉네임 중복 방지를 위해 설정 랜덤 숫자 생성(4자리)
+    public String randomNumber() {
+        int leftLimit = 48; // number -> 0
+        int rightLimit = 57; // number -> 9
+        int targetStringLength = 4;
+        Random random = new Random();
+        String generatedNumber = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return generatedNumber;
+    }
+
+    // 닉네임 중복 체크
+    @Transactional(readOnly = true)
+    public Member checkNickname(String nickname) {
+        Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
+        return optionalMember.orElse(null);
+    }
+
 }
