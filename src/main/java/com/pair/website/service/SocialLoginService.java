@@ -20,11 +20,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -145,6 +147,8 @@ public class SocialLoginService {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
+            // 닉네임 중복확인
+            // memberRepository.findByNickname()
             member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #").profileImage(kakaoImage).password(passwordEncoder.encode(randPassword)).build();
 
             memberRepository.save(member);
@@ -166,7 +170,6 @@ public class SocialLoginService {
         int targetStringLength = 10;
         Random random = new Random();
         String generatedString = random.ints(leftLimit, rightLimit + 1)
-                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
                 .limit(targetStringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
@@ -174,7 +177,7 @@ public class SocialLoginService {
         return generatedString;
     }
 
-    // 닉네임 중복 방지를 위해 설정 랜덤 문자열 생성(4자리)
+    // 닉네임 중복 방지를 위해 설정 랜덤 숫자 생성(4자리)
     public String randomNumber() {
         int leftLimit = 48; // number -> 0
         int rightLimit = 57; // number -> 9
@@ -184,8 +187,15 @@ public class SocialLoginService {
                 .limit(targetStringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
-        System.out.println(generatedNumber);
 
         return generatedNumber;
     }
+
+    // 닉네임 중복 체크
+    @Transactional(readOnly = true)
+    public Member checkNickname(String nickname) {
+        Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
+        return optionalMember.orElse(null);
+    }
+
 }
