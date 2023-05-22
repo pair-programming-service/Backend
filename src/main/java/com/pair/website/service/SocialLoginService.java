@@ -42,9 +42,6 @@ public class SocialLoginService {
     @Value("${kakao.redirectUrl}")
     String KAKAO_REDIRECT_URI;
 
-    // 닉네임 중복처리를 위해 int max부터 내림차순으로 #id추가 ex)제리 #9999999
-    int maxID = 10000000;
-
     public BaseResponseDto<?> kakaoLogin(String code, HttpServletResponse response) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getAccessToken(code).getAccess_token();
@@ -142,15 +139,13 @@ public class SocialLoginService {
                 .orElse(null);
 
         // random password 생성
-        String ranPassword = randomString();
-
-        maxID = maxID - 1;
+        String randPassword = randomString();
 
         if (member == null) {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
-            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #" + maxID).profileImage(kakaoImage).password(passwordEncoder.encode(ranPassword)).build();
+            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #").profileImage(kakaoImage).password(passwordEncoder.encode(randPassword)).build();
 
             memberRepository.save(member);
         }
@@ -177,5 +172,20 @@ public class SocialLoginService {
                 .toString();
 
         return generatedString;
+    }
+
+    // 닉네임 중복 방지를 위해 설정 랜덤 문자열 생성(4자리)
+    public String randomNumber() {
+        int leftLimit = 48; // number -> 0
+        int rightLimit = 57; // number -> 9
+        int targetStringLength = 4;
+        Random random = new Random();
+        String generatedNumber = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        System.out.println(generatedNumber);
+
+        return generatedNumber;
     }
 }
