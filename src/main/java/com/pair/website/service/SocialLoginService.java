@@ -140,16 +140,20 @@ public class SocialLoginService {
         Member member = memberRepository.findByEmail(kakaoEmail)
                 .orElse(null);
 
-        // random password 생성
-        String randPassword = randomString();
 
         if (member == null) {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
+
             // 닉네임 중복확인
-            // memberRepository.findByNickname()
-            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #").profileImage(kakaoImage).password(passwordEncoder.encode(randPassword)).build();
+            while (checkNickname(kakaoName) != null) {
+                kakaoName += " #" + randomNumber();
+            }
+
+            // random password 생성
+            String randPassword = randomString();
+            member = Member.builder().email(kakaoEmail).nickname(kakaoName).profileImage(kakaoImage).password(passwordEncoder.encode(randPassword)).build();
 
             memberRepository.save(member);
         }
