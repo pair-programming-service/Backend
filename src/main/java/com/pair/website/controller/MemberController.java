@@ -51,4 +51,9 @@ public class MemberController {
 
         return memberService.getProfile(member.getId());
     }
+
+    @GetMapping("/api/member/detail/{nickname}")
+    public ResponseEntity<?> getOtherProfile(@PathVariable String nickname){
+        return memberService.getOtherProfile(nickname);
+    }
 }
