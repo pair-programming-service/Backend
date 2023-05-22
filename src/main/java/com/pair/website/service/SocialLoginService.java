@@ -18,21 +18,23 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SocialLoginService {
 
-    @Autowired
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     // 환경변수로 바꾸기
     @Value("${kakao.clientId}")
@@ -139,14 +141,16 @@ public class SocialLoginService {
         Member member = memberRepository.findByEmail(kakaoEmail)
                 .orElse(null);
 
+        // random password 생성
+        String ranPassword = randomString();
+
         maxID = maxID - 1;
 
         if (member == null) {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
-            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #" + maxID).profileImage(kakaoImage).password("password").build();
-            //비밀번호 암호화 로직 추가하기
+            member = Member.builder().email(kakaoEmail).nickname(kakaoName + " #" + maxID).profileImage(kakaoImage).password(passwordEncoder.encode(ranPassword)).build();
 
             memberRepository.save(member);
         }
@@ -158,5 +162,20 @@ public class SocialLoginService {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
         response.addHeader("refreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
+    }
+
+    // 카카오 로그인 비밀번호 암호화 전 랜덤 비밀번호 생성
+    public String randomString() {
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+        Random random = new Random();
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return generatedString;
     }
 }
