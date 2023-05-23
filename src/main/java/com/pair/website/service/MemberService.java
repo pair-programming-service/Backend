@@ -1,5 +1,6 @@
 package com.pair.website.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.pair.website.configuration.s3.AwsS3Uploader;
 import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,13 +40,13 @@ public class MemberService {
 
     public ResponseEntity<?> signup(@Valid MemberRequestDto requestDto) {
         if (isPresentMember(requestDto.getEmail()) != null) {
-            return new ResponseEntity<>(BaseResponseDto.fail("DUPLICATED_NICKNAME",
+            return new ResponseEntity<>(BaseResponseDto.fail("DUPLICATED_EMAIL",
                     "중복된 아이디입니다."), HttpStatus.BAD_REQUEST);
         }
 
         if (checkNickname(requestDto.getNickname()) != null) {
-            return new ResponseEntity<>(BaseResponseDto.fail("ALREADY_NICKNAME",
-                    "이미 사용중인 닉네임 입니다."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(BaseResponseDto.fail("DUPLICATED_NICKNAME",
+                    "중복된 닉네임입니다."), HttpStatus.BAD_REQUEST);
         }
         Member member = Member.builder()
                 .email(requestDto.getEmail())
@@ -96,7 +98,7 @@ public class MemberService {
     // 마이페이지 조회
     public BaseResponseDto<?> getProfile(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("NOT_FOUND_MEMBER")
+                () -> new NotFoundException("NOT_FOUND_MEMBER")
         );
 
         List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
@@ -112,6 +114,25 @@ public class MemberService {
                 .build());
     }
 
+    // 다른 멤버 마이페이지 조회
+    public ResponseEntity<?> getOtherProfile(String nickname) {
+        Member member = memberRepository.findByNickname(nickname).orElseThrow(
+                () -> new NotFoundException("NOT_FOUND_MEMBER")
+        );
+
+        List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
+
+        return new ResponseEntity<>(BaseResponseDto.success(MemberResponseDto.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .profileImage(member.getProfileImage())
+                .githubLink(member.getGithubLink())
+                .createdAt(member.getCreatedAt())
+                .boardList(boardListResponseDtos)
+                .build()),HttpStatus.OK);
+    }
+
     // 프로필 수정
     @Transactional
     public BaseResponseDto<?> profileUpdate(MultipartFile image, ProfileRequestDto requestDto, Long id) throws IOException {
@@ -123,6 +144,10 @@ public class MemberService {
             storedFileName = awsS3Uploader.upload(image, "images");
             member.setProfileImage(storedFileName);
         }
+
+        if(checkNickname(requestDto.getNickname()) != null)
+            return BaseResponseDto.fail("DUPLICATED_NICKNAME","중복된 닉네임 입니다.");
+
 
         member.update(ProfileRequestDto.builder()
                 .nickname(requestDto.getNickname())
