@@ -71,11 +71,13 @@ public class MemberService {
     public BaseResponseDto<?> login(@Valid LoginRequestDto loginRequestDto, HttpServletResponse response) {
         Member member = isPresentMember(loginRequestDto.getEmail());
         if (null == member) {
+            failedLogin(response);
             return BaseResponseDto.fail("MEMBER_NOT_FOUND",
                     "사용자를 찾을 수 없습니다.");
         }
 
         if (!member.validatePassword(passwordEncoder, loginRequestDto.getPassword())) {
+            failedLogin(response);
             return BaseResponseDto.fail("INVALID_MEMBER", "사용자를 찾을 수 없습니다.");
         }
 
@@ -193,5 +195,10 @@ public class MemberService {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
         response.addHeader("refreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
+    }
+
+    public void failedLogin(HttpServletResponse response) {
+        response.addHeader("Authorization" , "null");
+        response.addHeader("refreshToken" , "null");
     }
 }
