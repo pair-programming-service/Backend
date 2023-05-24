@@ -68,24 +68,22 @@ public class MemberService {
 
 
     @Transactional
-    public BaseResponseDto<?> login(@Valid LoginRequestDto loginRequestDto, HttpServletResponse response) {
+    public ResponseEntity<?> login(@Valid LoginRequestDto loginRequestDto, HttpServletResponse response) {
         Member member = isPresentMember(loginRequestDto.getEmail());
         if (null == member) {
-            failedLogin(response);
-            return BaseResponseDto.fail("MEMBER_NOT_FOUND",
-                    "사용자를 찾을 수 없습니다.");
+            return new ResponseEntity<>(BaseResponseDto.fail("MEMBER_NOT_FOUND",
+                    "사용자를 찾을 수 없습니다."),HttpStatus.NOT_FOUND);
         }
 
         if (!member.validatePassword(passwordEncoder, loginRequestDto.getPassword())) {
-            failedLogin(response);
-            return BaseResponseDto.fail("INVALID_MEMBER", "사용자를 찾을 수 없습니다.");
+            return new ResponseEntity<>(BaseResponseDto.fail("INVALID_MEMBER", "사용자를 찾을 수 없습니다."),HttpStatus.NOT_FOUND);
         }
 
 
         TokenDto tokenDto = tokenProvider.generateTokenDto(member);
         tokenToHeaders(tokenDto, response);
 
-        return BaseResponseDto.success(
+        return new ResponseEntity<>(BaseResponseDto.success(
                 MemberResponseDto.builder()
                         .id(member.getId())
                         .email(member.getEmail())
@@ -93,8 +91,7 @@ public class MemberService {
                         .profileImage(member.getProfileImage())
                         .githubLink(member.getGithubLink())
                         .createdAt(member.getCreatedAt())
-                        .build()
-        );
+                        .build()),HttpStatus.OK);
     }
 
     // 마이페이지 조회
@@ -195,10 +192,5 @@ public class MemberService {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
         response.addHeader("refreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
-    }
-
-    public void failedLogin(HttpServletResponse response) {
-        response.addHeader("Authorization" , "null");
-        response.addHeader("refreshToken" , "null");
     }
 }
