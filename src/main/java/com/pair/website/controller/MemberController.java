@@ -23,18 +23,35 @@ public class MemberController {
     private final PublicMethod publicMethod;
 
 
+    /**
+     * 회원가입 API
+     *
+     * @param memberRequestDto 회원가입 정보
+     * @return BaseResponseDto<MemberResponseDto> 200 OK, 가입한 회원 정보, JWT 토큰
+     */
     @PostMapping("/api/member/signup")
     public ResponseEntity<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
         return memberService.signup(memberRequestDto);
     }
 
+    /**
+     * 로그인 API
+     *
+     * @param loginRequestDto 아이디, 비밀번호
+     * @return BaseResponseDto<MemberResponseDto> 200 OK, 가입한 회원 정보, JWT 토큰
+     */
     @PostMapping("/api/member/login")
     public BaseResponseDto<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         return memberService.login(loginRequestDto, response);
     }
 
+    /**
+     * 회원정보 수정 API
+     *
+     * @return BaseResponseDto<MemberResponseDto> 200 OK, 수정된 회원정보 및 작성한 게시물
+     */
     @PutMapping("/api/member/update")
-    public BaseResponseDto<?> profileUpdate(@RequestPart ProfileRequestDto requestDto, HttpServletRequest request, @RequestPart(value = "image") MultipartFile image) throws IOException {
+    public BaseResponseDto<?> updateProfile(@RequestPart ProfileRequestDto requestDto, HttpServletRequest request, @RequestPart(value = "image") MultipartFile image) throws IOException {
         BaseResponseDto<?> result = publicMethod.checkLogin(request);
         if (!result.isSuccess()) return result;
         Member member = (Member) result.getData();
@@ -42,6 +59,11 @@ public class MemberController {
         return memberService.profileUpdate(image, requestDto, member.getId());
     }
 
+    /**
+     * 마이페이지 조회 API
+     *
+     * @return BaseResponseDto<MemberResponseDto> 200 OK, 회원정보 및 작성한 게시물
+     */
     @GetMapping("/api/member/detail")
     public BaseResponseDto<?> getProfile(HttpServletRequest request) {
 
@@ -52,8 +74,14 @@ public class MemberController {
         return memberService.getProfile(member.getId());
     }
 
+    /**
+     * nickname을 통한 마이페이지 조회 API
+     *
+     * @param nickname 닉네임
+     * @return BaseResponseDto<MemberResponseDto> 200 OK, 회원정보 및 작성한 게시물
+     */
     @GetMapping("/api/member/detail/{nickname}")
-    public ResponseEntity<?> getOtherProfile(@PathVariable String nickname){
+    public ResponseEntity<?> getOtherProfile(@PathVariable String nickname) {
         return memberService.getOtherProfile(nickname);
     }
 }
