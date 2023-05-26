@@ -23,7 +23,7 @@ public class MemberResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YY-MM-dd HH:MM", timezone = "Asia/Seoul", locale = "en")
     private LocalDateTime createdAt;
     // @JsonIgnore
-    private List<BoardListResponseDto> boardList;
+    private List<BoardAllResponseDto> boardList;
 
     @Override
     public String toString() {

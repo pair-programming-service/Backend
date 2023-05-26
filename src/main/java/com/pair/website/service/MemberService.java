@@ -5,6 +5,7 @@ import com.pair.website.configuration.s3.AwsS3Uploader;
 import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.*;
+import com.pair.website.dto.response.BoardAllResponseDto;
 import com.pair.website.dto.response.MemberResponseDto;
 import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.MemberRepository;
@@ -34,6 +35,7 @@ public class MemberService {
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
     private final PairBoardRepository pairBoardRepository;
+    private final PairBoardService pairBoardService;
     private final PasswordEncoder passwordEncoder;
     private final AwsS3Uploader awsS3Uploader;
 
@@ -99,8 +101,12 @@ public class MemberService {
         Member member = memberRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("NOT_FOUND_MEMBER")
         );
+        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member.getId());
+        List<BoardAllResponseDto> boardAllResponseDtos = new ArrayList<>();
 
-        List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
+        for (PairBoard board : boards) {
+            pairBoardService.boardList(board,boardAllResponseDtos);
+        }
 
         return BaseResponseDto.success(MemberResponseDto.builder()
                 .id(member.getId())
@@ -109,7 +115,7 @@ public class MemberService {
                 .profileImage(member.getProfileImage())
                 .githubLink(member.getGithubLink())
                 .createdAt(member.getCreatedAt())
-                .boardList(boardListResponseDtos)
+                .boardList(boardAllResponseDtos)
                 .build());
     }
 
@@ -119,7 +125,12 @@ public class MemberService {
                 () -> new NotFoundException("NOT_FOUND_MEMBER")
         );
 
-        List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
+        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member.getId());
+        List<BoardAllResponseDto> boardAllResponseDtos = new ArrayList<>();
+
+        for (PairBoard board : boards) {
+            pairBoardService.boardList(board,boardAllResponseDtos);
+        }
 
         return new ResponseEntity<>(BaseResponseDto.success(MemberResponseDto.builder()
                 .id(member.getId())
@@ -128,7 +139,7 @@ public class MemberService {
                 .profileImage(member.getProfileImage())
                 .githubLink(member.getGithubLink())
                 .createdAt(member.getCreatedAt())
-                .boardList(boardListResponseDtos)
+                .boardList(boardAllResponseDtos)
                 .build()), HttpStatus.OK);
     }
 
@@ -154,7 +165,12 @@ public class MemberService {
                 .githubLink(requestDto.getGithubLink())
                 .build(), storedFileName);
 
-        List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
+        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member.getId());
+        List<BoardAllResponseDto> boardAllResponseDtos = new ArrayList<>();
+
+        for (PairBoard board : boards) {
+            pairBoardService.boardList(board,boardAllResponseDtos);
+        }
 
         return BaseResponseDto.success(MemberResponseDto.builder()
                 .id(member.getId())
@@ -162,7 +178,7 @@ public class MemberService {
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .githubLink(member.getGithubLink())
-                .boardList(boardListResponseDtos)
+                .boardList(boardAllResponseDtos)
                 .createdAt(member.getCreatedAt())
                 .build());
     }
@@ -177,16 +193,6 @@ public class MemberService {
     public Member checkNickname(String nickname) {
         Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
         return optionalMember.orElse(null);
-    }
-
-    public List<BoardListResponseDto> boardList(Long member_id) {
-        List<PairBoard> boards = pairBoardRepository.findAllByMemberId(member_id);
-        List<BoardListResponseDto> boardListResponseDtos = new ArrayList<>();
-
-        for (PairBoard board : boards) {
-            boardListResponseDtos.add(BoardListResponseDto.builder().title(board.getTitle()).content(board.getContent()).category(board.getCategory()).build());
-        }
-        return boardListResponseDtos;
     }
 
     public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
