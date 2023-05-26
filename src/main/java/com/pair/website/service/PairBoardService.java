@@ -79,19 +79,7 @@ public class PairBoardService {
 
         List<BoardAllResponseDto> boardAllResponseDtos = new ArrayList<>();
         for (PairBoard pairBoard : pairBoards) {
-            // BoardLanguage정보를 Response에 담아주기 위한 객체 생성
-            Optional<BoardLanguage> boardLanguage = boardLanguageRepository.findById(
-                    pairBoard.getBoardLanguage().getId());
-            List<String> languageList = new ArrayList<>();
-            languageCheck(boardLanguage, languageList);
-            boardAllResponseDtos.add(
-                    BoardAllResponseDto.builder().id(pairBoard.getId()).nickname(pairBoard.getMember().getNickname()).title(pairBoard.getTitle())
-                            .content(pairBoard.getContent()).ide(pairBoard.getIde())
-                            .runningTime(pairBoard.getRunningTime()).proceed(pairBoard.getProceed())
-                            .category(pairBoard.getCategory()).language(languageList)
-                            .runningDate(pairBoard.getRunningDate()).status(pairBoard.getStatus())
-                            .viewCount(pairBoard.getViewCount()).createdAt(pairBoard.getCreatedAt())
-                            .updatedAt(pairBoard.getUpdatedAt()).build());
+            boardList(pairBoard,boardAllResponseDtos);
         }
         return PageResponseDto.success(boardAllResponseDtos,pairBoards.getTotalPages());
     }
@@ -230,5 +218,20 @@ public class PairBoardService {
         }
         return boardLanguageResponseDto;
     }
-
+    public List<BoardAllResponseDto> boardList(PairBoard pairBoard,List<BoardAllResponseDto> boardAllResponseDtos){
+        // BoardLanguage정보를 Response에 담아주기 위한 객체 생성
+        Optional<BoardLanguage> boardLanguage = boardLanguageRepository.findById(
+                pairBoard.getBoardLanguage().getId());
+        List<String> languageList = new ArrayList<>();
+        languageCheck(boardLanguage, languageList);
+        boardAllResponseDtos.add(
+                BoardAllResponseDto.builder().id(pairBoard.getId()).nickname(pairBoard.getMember().getNickname()).title(pairBoard.getTitle())
+                        .content(pairBoard.getContent()).ide(pairBoard.getIde())
+                        .runningTime(pairBoard.getRunningTime()).proceed(pairBoard.getProceed())
+                        .category(pairBoard.getCategory()).language(languageList)
+                        .runningDate(pairBoard.getRunningDate()).status(pairBoard.getStatus())
+                        .viewCount(pairBoard.getViewCount()).createdAt(pairBoard.getCreatedAt())
+                        .updatedAt(pairBoard.getUpdatedAt()).build());
+        return boardAllResponseDtos;
+    }
 }

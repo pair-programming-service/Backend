@@ -41,7 +41,7 @@ public class MemberController {
      * @return BaseResponseDto<MemberResponseDto> 200 OK, 가입한 회원 정보, JWT 토큰
      */
     @PostMapping("/api/member/login")
-    public BaseResponseDto<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         return memberService.login(loginRequestDto, response);
     }
 
