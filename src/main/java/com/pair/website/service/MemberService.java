@@ -129,7 +129,7 @@ public class MemberService {
                 .githubLink(member.getGithubLink())
                 .createdAt(member.getCreatedAt())
                 .boardList(boardListResponseDtos)
-                .build()),HttpStatus.OK);
+                .build()), HttpStatus.OK);
     }
 
     // 프로필 수정
@@ -138,15 +138,16 @@ public class MemberService {
         Member member = memberRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("NOT_FOUND_MEMBER")
         );
+
+
+        if (member.getNickname() != requestDto.getNickname() & checkNickname(requestDto.getNickname()) != null)
+            return BaseResponseDto.fail("DUPLICATED_NICKNAME", "중복된 닉네임 입니다.");
+
         String storedFileName = null;
         if (!image.isEmpty()) {
             storedFileName = awsS3Uploader.upload(image, "images");
-            member.setProfileImage(storedFileName);
+            // member.setProfileImage(storedFileName);
         }
-
-        if(checkNickname(requestDto.getNickname()) != null)
-            return BaseResponseDto.fail("DUPLICATED_NICKNAME","중복된 닉네임 입니다.");
-
 
         member.update(ProfileRequestDto.builder()
                 .nickname(requestDto.getNickname())
