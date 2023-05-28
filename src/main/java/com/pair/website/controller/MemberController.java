@@ -51,7 +51,7 @@ public class MemberController {
      * @return BaseResponseDto<MemberResponseDto> 200 OK, 수정된 회원정보 및 작성한 게시물
      */
     @PutMapping("/api/member/update")
-    public BaseResponseDto<?> updateProfile(@RequestPart ProfileRequestDto requestDto, HttpServletRequest request, @RequestPart(value = "image") MultipartFile image) throws IOException {
+    public BaseResponseDto<?> updateProfile(@RequestPart ProfileRequestDto requestDto, HttpServletRequest request, @RequestPart(value = "image",required = false) MultipartFile image) throws IOException {
         BaseResponseDto<?> result = publicMethod.checkLogin(request);
         if (!result.isSuccess()) return result;
         Member member = (Member) result.getData();
