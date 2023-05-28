@@ -151,11 +151,12 @@ public class MemberService {
         );
 
 
-        if (member.getNickname() != requestDto.getNickname() & checkNickname(requestDto.getNickname()) != null)
+        if (!member.getNickname().equals(requestDto.getNickname())  && checkNickname(requestDto.getNickname()) != null)
             return BaseResponseDto.fail("DUPLICATED_NICKNAME", "중복된 닉네임 입니다.");
-
         String storedFileName = null;
-        if (!image.isEmpty()) {
+        if(image == null)
+            storedFileName = member.getProfileImage();
+        else if (!image.isEmpty()) {
             storedFileName = awsS3Uploader.upload(image, "images");
             // member.setProfileImage(storedFileName);
         }
