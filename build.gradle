@@ -62,6 +62,11 @@ dependencies {
     // s3 버킷
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+    // websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 // querydsl 사용할 경로 지정합니다.
