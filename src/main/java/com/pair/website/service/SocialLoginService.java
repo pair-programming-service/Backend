@@ -2,6 +2,7 @@ package com.pair.website.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pair.website.configuration.s3.AwsS3Uploader;
 import com.pair.website.dto.TokenDto;
 import com.pair.website.domain.Member;
 import com.pair.website.dto.BaseResponseDto;
@@ -12,6 +13,9 @@ import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -24,8 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.Random;
 
@@ -37,6 +45,8 @@ public class SocialLoginService {
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final AwsS3Uploader awsS3Uploader;
+
 
     // 환경변수로 바꾸기
     @Value("${kakao.clientId}")
@@ -145,6 +155,23 @@ public class SocialLoginService {
             // 회원가입
             String kakaoName = kakaoAccountDto.getKakao_account().getProfile().getNickname();
             String kakaoImage = kakaoAccountDto.getKakao_account().getProfile().getProfile_image_url();
+
+            /*File file = new File(new File("").getAbsolutePath() + kakaoImage);
+            FileItem fileItem = new DiskFileItem("originFile", Files.probeContentType(file.toPath()), false, file.getName(), (int) file.length(), file.getParentFile());
+
+            try {
+                InputStream input = new FileInputStream(file);
+                OutputStream os = fileItem.getOutputStream();
+                IOUtils.copy(input, os);
+                // Or faster..
+                // IOUtils.copy(new FileInputStream(file), fileItem.getOutputStream());
+            } catch (IOException ex) {
+                // do something.
+            }
+
+            //jpa.png -> multipart 변환
+            MultipartFile mFile = new CommonsMultipartFile(fileItem);*/
+
 
             // 닉네임 중복확인
             while (checkNickname(kakaoName) != null) {
