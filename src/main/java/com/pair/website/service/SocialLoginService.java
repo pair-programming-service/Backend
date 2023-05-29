@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pair.website.dto.TokenDto;
 import com.pair.website.domain.Member;
-import com.pair.website.dto.BaseResponseDto;
+import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.dto.LoginResponseDto;
 import com.pair.website.dto.kakao.KakaoTokenDto;
 import com.pair.website.dto.kakao.KakaoAccountDto;

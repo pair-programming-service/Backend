@@ -1,11 +1,9 @@
 package com.pair.website.controller;
 
-import com.pair.website.dto.BaseResponseDto;
-import com.pair.website.dto.kakao.KakaoAccountDto;
+import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.service.SocialLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

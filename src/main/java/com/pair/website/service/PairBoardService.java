@@ -3,13 +3,11 @@ package com.pair.website.service;
 import com.pair.website.domain.BoardLanguage;
 import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
-import com.pair.website.dto.BaseResponseDto;
+import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.dto.PairBoardSaveRequestDto;
 import com.pair.website.dto.response.PairBoardSaveResponseDto;
 import com.pair.website.dto.response.BoardAllResponseDto;
 import com.pair.website.dto.response.BoardLanguageResponseDto;
-import com.pair.website.dto.response.PageResponseDto;
-import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.BoardLanguageRepository;
 import com.pair.website.repository.PairBoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +65,7 @@ public class PairBoardService {
 
     // 페어 목록 글 전체 보기
     @Transactional(readOnly = true)
-    public PageResponseDto<?> getAll(int page, int size, String keyword,String category, Boolean status,Boolean cLanguage,
+    public BaseResponseDto<?> getAll(int page, int size, String keyword,String category, Boolean status,Boolean cLanguage,
                                      Boolean cSharp , Boolean cPlusPlus, Boolean javaScript,
                                      Boolean java, Boolean python, Boolean nodeJs, Boolean typeScript) {
         Pageable pageable = PageRequest.of(page, size); // 페이징 처리
@@ -93,7 +90,7 @@ public class PairBoardService {
                             .viewCount(pairBoard.getViewCount()).createdAt(pairBoard.getCreatedAt())
                             .updatedAt(pairBoard.getUpdatedAt()).build());
         }
-        return PageResponseDto.success(boardAllResponseDtos,pairBoards.getTotalPages());
+        return BaseResponseDto.page(pairBoards.getTotalPages(),boardAllResponseDtos);
     }
 
     @Transactional

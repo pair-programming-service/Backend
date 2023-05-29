@@ -62,7 +62,6 @@ public class Member extends BaseTimeEntity {
 
     public void update(ProfileRequestDto requestDto) {
         this.nickname = requestDto.getNickname();
-        this.profileImage = requestDto.getProfileImage();
         this.githubLink = requestDto.getGithubLink();
     }
 }

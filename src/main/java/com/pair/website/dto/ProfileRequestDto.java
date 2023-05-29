@@ -7,6 +7,5 @@ import lombok.Getter;
 @Builder
 public class ProfileRequestDto {
     private String nickname;
-    private String profileImage;
     private String githubLink;
 }

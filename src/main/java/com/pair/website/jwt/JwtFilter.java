@@ -2,7 +2,7 @@ package com.pair.website.jwt;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pair.website.dto.BaseResponseDto;
+import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.dto.TokenDto;
 import com.pair.website.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;

@@ -1,13 +1,11 @@
 package com.pair.website.controller;
 
 import com.pair.website.domain.Member;
-import com.pair.website.dto.BaseResponseDto;
+import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.dto.PairBoardSaveRequestDto;
-import com.pair.website.dto.response.PageResponseDto;
 import com.pair.website.service.PairBoardService;
 import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,7 +33,7 @@ public class PairBoardController {
     }
 
     @GetMapping("/api/board/all")
-    public PageResponseDto<?> getAll(
+    public BaseResponseDto<?> getAll(
                                      @RequestParam(value = "page",defaultValue = "1") int page, @RequestParam(value = "size",defaultValue = "20") int size,
                                      @RequestParam(value = "search", defaultValue = "") String keyword,@RequestParam(value = "category" , defaultValue = "") String category,
                                      @RequestParam(value = "status", defaultValue = "true") Boolean status,@RequestParam(value = "cLanguage", defaultValue = "false") Boolean cLanguage,

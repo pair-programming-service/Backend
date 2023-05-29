@@ -1,10 +1,8 @@
 package com.pair.website.controller;
 
 import com.pair.website.domain.Member;
-import com.pair.website.dto.BaseResponseDto;
-import com.pair.website.dto.LoginRequestDto;
-import com.pair.website.dto.MemberRequestDto;
-import com.pair.website.dto.ProfileRequestDto;
+import com.pair.website.dto.*;
+import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.service.MemberService;
 import com.pair.website.util.PublicMethod;
 import lombok.RequiredArgsConstructor;
@@ -39,16 +37,23 @@ public class MemberController {
         if (!result.isSuccess()) return result;
         Member member = (Member) result.getData();
 
-        return memberService.profileUpdate(image, requestDto, member);
+        return memberService.profileUpdate(image, requestDto, member.getId());
     }
 
     @GetMapping("/api/member/detail")
     public BaseResponseDto<?> getProfile(HttpServletRequest request) {
-
         BaseResponseDto<?> result = publicMethod.checkLogin(request);
         if (!result.isSuccess()) return result;
         Member member = (Member) result.getData();
 
         return memberService.getProfile(member.getId());
+    }
+
+    @PostMapping("/api/room/produce/{customer_id}")
+    public BaseResponseDto<?> roomProduce(HttpServletRequest request, @PathVariable Long customer_id){
+        BaseResponseDto<?> result = publicMethod.checkLogin(request);
+        if (!result.isSuccess()) return result;
+        Member member = (Member) result.getData();
+        return memberService.roomProduce(member,customer_id);
     }
 }

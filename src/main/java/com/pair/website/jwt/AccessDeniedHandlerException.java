@@ -1,7 +1,7 @@
 package com.pair.website.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pair.website.dto.BaseResponseDto;
+import com.pair.website.dto.response.BaseResponseDto;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;

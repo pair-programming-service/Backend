@@ -1,7 +1,7 @@
 package com.pair.website.util;
 
 import com.pair.website.domain.Member;
-import com.pair.website.dto.BaseResponseDto;
+import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

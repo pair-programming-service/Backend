@@ -3,7 +3,7 @@ package com.pair.website.jwt;
 
 import com.pair.website.domain.Member;
 import com.pair.website.domain.RefreshToken;
-import com.pair.website.dto.BaseResponseDto;
+import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.dto.TokenDto;
 import com.pair.website.repository.RefreshTokenRepository;
 import com.pair.website.service.UserDetailsImpl;

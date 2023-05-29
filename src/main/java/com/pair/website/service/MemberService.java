@@ -1,11 +1,17 @@
 package com.pair.website.service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.pair.website.configuration.s3.AwsS3Uploader;
+import com.pair.website.domain.ChatRoom;
 import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.*;
+import com.pair.website.dto.response.BaseResponseDto;
+import com.pair.website.dto.response.BoardListResponseDto;
+import com.pair.website.dto.response.ChatRoomResponseDto;
 import com.pair.website.dto.response.MemberResponseDto;
 import com.pair.website.jwt.TokenProvider;
+import com.pair.website.repository.ChatRoomRepository;
 import com.pair.website.repository.MemberRepository;
 import com.pair.website.repository.PairBoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +41,7 @@ public class MemberService {
     private final PairBoardRepository pairBoardRepository;
     private final PasswordEncoder passwordEncoder;
     private final AwsS3Uploader awsS3Uploader;
+    private final ChatRoomRepository chatRoomRepository;
 
 
     public ResponseEntity<?> signup(@Valid MemberRequestDto requestDto) {
@@ -115,7 +122,10 @@ public class MemberService {
 
     // 프로필 수정
     @Transactional
-    public BaseResponseDto<?> profileUpdate(MultipartFile image, ProfileRequestDto requestDto, Member member) throws IOException {
+    public BaseResponseDto<?> profileUpdate(MultipartFile image, ProfileRequestDto requestDto, Long member_id) throws IOException {
+        Member member = memberRepository.findById(member_id).orElseThrow(
+                () -> new NotFoundException("존재하지 않는 회원입니다.")
+        );
         if (!image.isEmpty()) {
             String storedFileName = awsS3Uploader.upload(image, "images");
             member.setProfileImage(storedFileName);
@@ -123,10 +133,9 @@ public class MemberService {
 
         member.update(ProfileRequestDto.builder()
                 .nickname(requestDto.getNickname())
-                .profileImage(member.getProfileImage())
                 .githubLink(requestDto.getGithubLink())
                 .build());
-        memberRepository.save(member);
+//        memberRepository.save(member);
         List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
 
         return BaseResponseDto.success(MemberResponseDto.builder()
@@ -137,6 +146,24 @@ public class MemberService {
                 .githubLink(member.getGithubLink())
                 .boardList(boardListResponseDtos)
                 .createdAt(member.getCreatedAt())
+                .build());
+    }
+
+    @Transactional
+    public BaseResponseDto<?> roomProduce(Member member,Long customer_id){
+        Member customer = memberRepository.findById(customer_id).orElseThrow(
+                () -> new NotFoundException("사용자를 찾을 수 없습니다.")
+        );
+        ChatRoom chatRoom = ChatRoom.builder()
+                .seller(member)
+                .customer(customer)
+                .build();
+        chatRoomRepository.save(chatRoom);
+
+        return BaseResponseDto.success(ChatRoomResponseDto.builder()
+                .id(chatRoom.getId())
+                .seller(chatRoom.getSeller().getNickname())
+                .customer(chatRoom.getCustomer().getNickname())
                 .build());
     }
 
