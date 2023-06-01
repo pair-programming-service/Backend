@@ -148,7 +148,7 @@ public class SocialLoginService {
 
             // 닉네임 중복확인
             while (checkNickname(kakaoName) != null) {
-                kakaoName += " #" + randomNumber();
+                kakaoName += "#" + randomNumber();
             }
 
             // random password 생성
