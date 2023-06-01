@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -122,15 +121,7 @@ public class MemberService {
 
         List<BoardListResponseDto> boardListResponseDtos = boardList(member.getId());
 
-        return new ResponseEntity<>(BaseResponseDto.success(MemberResponseDto.builder()
-                .id(member.getId())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
-                .githubLink(member.getGithubLink())
-                .createdAt(member.getCreatedAt())
-                .boardList(boardListResponseDtos)
-                .build()), HttpStatus.OK);
+        return new ResponseEntity<>(BaseResponseDto.success(boardListResponseDtos), HttpStatus.OK);
     }
 
     // 프로필 수정

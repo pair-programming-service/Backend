@@ -1,10 +1,7 @@
 package com.pair.website.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.BoardListResponseDto;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
