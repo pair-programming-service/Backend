@@ -108,15 +108,7 @@ public class MemberService {
             pairBoardService.boardList(board,boardAllResponseDtos);
         }
 
-        return BaseResponseDto.success(MemberResponseDto.builder()
-                .id(member.getId())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
-                .githubLink(member.getGithubLink())
-                .createdAt(member.getCreatedAt())
-                .boardList(boardAllResponseDtos)
-                .build());
+        return BaseResponseDto.success(boardAllResponseDtos);
     }
 
     // 다른 멤버 마이페이지 조회
