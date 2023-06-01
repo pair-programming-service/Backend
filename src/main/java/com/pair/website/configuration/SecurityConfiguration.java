@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -73,6 +74,9 @@ public class SecurityConfiguration {
                 .antMatchers("/api/board/all").permitAll()
                 .antMatchers("/api/board/detail/**").permitAll()
                 .antMatchers("/api/oauth/token/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/chat").permitAll()
+                .antMatchers(HttpMethod.GET, "/chat/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/chats/**").permitAll()
                 // 그 이외의 모든 요청 인증 후 인가
                 //.anyRequest().authenticated()
                 .and()
@@ -92,6 +96,7 @@ public class SecurityConfiguration {
         //허용할 url 설정
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("https://codingmate-callmejeje.vercel.app");
+        configuration.addAllowedOrigin("http://localhost:8080");
 
         //허용할 헤더 설정
         configuration.addAllowedHeader("*");
