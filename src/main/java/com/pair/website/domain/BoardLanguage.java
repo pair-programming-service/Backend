@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,8 +59,8 @@ public class BoardLanguage {
     private Boolean typeScript;
 
     public void update(Boolean cLanguage, Boolean cSharp,
-        Boolean cPlusPlus, Boolean javaScript, Boolean java, Boolean python, Boolean nodeJs,
-        Boolean typeScript) {
+                       Boolean cPlusPlus, Boolean javaScript, Boolean java, Boolean python, Boolean nodeJs,
+                       Boolean typeScript) {
         this.cLanguage = cLanguage;
         this.cSharp = cSharp;
         this.cPlusPlus = cPlusPlus;

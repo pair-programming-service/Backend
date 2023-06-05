@@ -49,7 +49,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     /**
-     * client가 접속 시 호출되는 메서드
+     * client가 접속 해제 시 호출되는 메서드
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {

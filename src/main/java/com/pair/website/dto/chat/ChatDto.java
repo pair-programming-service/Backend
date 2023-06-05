@@ -1,7 +1,6 @@
 package com.pair.website.dto.chat;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 
 @Data
@@ -19,4 +18,15 @@ public class ChatDto {
     private String message;// 메세지
     private String time; // 채팅 발송 시간
 
+    public ChatDto() {
+        
+    }
+
+    public ChatDto(MessageType type, String roomId, String sender, String message, String time) {
+        this.type = type;
+        this.roomId = roomId;
+        this.sender = sender;
+        this.message = message;
+        this.time = time;
+    }
 }
