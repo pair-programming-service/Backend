@@ -149,23 +149,6 @@ public class MemberService {
                 .build());
     }
 
-    @Transactional
-    public BaseResponseDto<?> roomProduce(Member member,Long customer_id){
-        Member customer = memberRepository.findById(customer_id).orElseThrow(
-                () -> new NotFoundException("사용자를 찾을 수 없습니다.")
-        );
-        ChatRoom chatRoom = ChatRoom.builder()
-                .seller(member)
-                .customer(customer)
-                .build();
-        chatRoomRepository.save(chatRoom);
-
-        return BaseResponseDto.success(ChatRoomResponseDto.builder()
-                .id(chatRoom.getId())
-                .seller(chatRoom.getSeller().getNickname())
-                .customer(chatRoom.getCustomer().getNickname())
-                .build());
-    }
 
     @Transactional(readOnly = true)
     public Member isPresentMember(String email) {

@@ -9,24 +9,22 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class ChatRoom {
+@AllArgsConstructor
+@Builder
+public class ChatRoom{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id")
-    private Member seller;
+    @Column
+    private String roomId;
+    @Column
+    private String member1;
+    private String member2;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    private Member customer;
-
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private List<Message> messageList = new ArrayList<>();
 }

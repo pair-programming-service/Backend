@@ -49,11 +49,4 @@ public class MemberController {
         return memberService.getProfile(member.getId());
     }
 
-    @PostMapping("/api/room/produce/{customer_id}")
-    public BaseResponseDto<?> roomProduce(HttpServletRequest request, @PathVariable Long customer_id){
-        BaseResponseDto<?> result = publicMethod.checkLogin(request);
-        if (!result.isSuccess()) return result;
-        Member member = (Member) result.getData();
-        return memberService.roomProduce(member,customer_id);
-    }
 }
