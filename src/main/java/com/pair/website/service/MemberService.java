@@ -2,13 +2,11 @@ package com.pair.website.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.pair.website.configuration.s3.AwsS3Uploader;
-import com.pair.website.domain.ChatRoom;
 import com.pair.website.domain.Member;
 import com.pair.website.domain.PairBoard;
 import com.pair.website.dto.*;
 import com.pair.website.dto.response.BaseResponseDto;
 import com.pair.website.dto.response.BoardListResponseDto;
-import com.pair.website.dto.response.ChatRoomResponseDto;
 import com.pair.website.dto.response.MemberResponseDto;
 import com.pair.website.jwt.TokenProvider;
 import com.pair.website.repository.ChatRoomRepository;
@@ -41,7 +39,6 @@ public class MemberService {
     private final PairBoardRepository pairBoardRepository;
     private final PasswordEncoder passwordEncoder;
     private final AwsS3Uploader awsS3Uploader;
-    private final ChatRoomRepository chatRoomRepository;
 
 
     public ResponseEntity<?> signup(@Valid MemberRequestDto requestDto) {
