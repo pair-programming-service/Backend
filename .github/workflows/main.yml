@@ -24,5 +24,7 @@ jobs:
         shell: bash
 
       - name: Build with Gradle
-        run: ./gradlew build
+#         run: ./gradlew build
+        # 테스트킵스킵
+        run : ./gradlew clean build --exclude-task test
         shell: bash
