@@ -3,7 +3,7 @@ name: Codingmate - Deploy to Amazon EC2
 on:
   push:
     branches:
-      - main
+      - master
       - action
 
 # 본인이 설정한 값을 여기서 채워넣습니다.
