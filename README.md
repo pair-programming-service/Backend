@@ -14,7 +14,8 @@
 
 
 ### 백엔드
-![BE](https://github.com/pair-programming-service/Backend/assets/66781422/3ca72c4e-3de7-4c55-bff2-8cee7010978d)
+
+![BE](https://github.com/pair-programming-service/Backend/assets/66781422/31d200f5-b0c4-4181-83bc-fcf06e896c6c)
 
 
 <br />
